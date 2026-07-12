@@ -46,8 +46,8 @@ export function AppLayout() {
       <div className="relative flex min-h-screen flex-col md:ml-[280px]">
         {/* Ambient background */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-20">
-          <div className="absolute -left-[10%] -top-[10%] h-[50%] w-[50%] rounded-full bg-primary-container blur-[120px]" />
-          <div className="absolute -bottom-[10%] -right-[10%] h-[40%] w-[40%] rounded-full bg-tertiary-container blur-[120px]" />
+          <div className="absolute left-[-10%] top-[-10%] h-[50%] w-[50%] rounded-full bg-primary-container blur-[120px]" />
+          <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-tertiary-container blur-[120px]" />
         </div>
 
         <Topbar onMenuClick={() => setDrawerOpen(true)} />
