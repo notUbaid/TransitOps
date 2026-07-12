@@ -1,8 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-const prisma = new PrismaClient();
 
 export default async function DashboardPage() {
   const activeVehiclesCount = await prisma.vehicle.count({ where: { status: "available" } });
