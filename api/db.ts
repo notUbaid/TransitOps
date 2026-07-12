@@ -55,6 +55,16 @@ function isExpired(dateStr: string): boolean {
   return new Date(dateStr).getTime() < Date.now();
 }
 
+
+async function insert(sql: any, table: string, record: Record<string, unknown>) {
+  const snaked = toSnake(record);
+  const keys = Object.keys(snaked);
+  const values = Object.values(snaked);
+  const cols = keys.join(', ');
+  const placeholders = keys.map((_, i) => '$' + (i + 1)).join(', ');
+  return sql(`INSERT INTO ${table} (${cols}) VALUES (${placeholders})`, values);
+}
+
 // ---- Full DB fetch ----
 
 async function fetchFullDb(sql: ReturnType<typeof getSql>): Promise<Database> {
@@ -69,13 +79,13 @@ async function fetchFullDb(sql: ReturnType<typeof getSql>): Promise<Database> {
   ]);
 
   return {
-    users: mapRows<User>(users),
-    vehicles: mapRows<Vehicle>(vehicles),
-    drivers: mapRows<Driver>(drivers),
-    trips: mapRows<Trip>(trips),
-    maintenance: mapRows<MaintenanceLog>(maintenance),
-    expenses: mapRows<Expense>(expenses),
-    settings: (mapRow<Settings>(settingsRows[0]) ?? {
+    users: mapRows<User>(users as any[]),
+    vehicles: mapRows<Vehicle>(vehicles as any[]),
+    drivers: mapRows<Driver>(drivers as any[]),
+    trips: mapRows<Trip>(trips as any[]),
+    maintenance: mapRows<MaintenanceLog>(maintenance as any[]),
+    expenses: mapRows<Expense>(expenses as any[]),
+    settings: (mapRow<Settings>((settingsRows as any[])[0]) ?? {
       companyName: "TransitOps Fleet Solutions",
       depotName: "Gandhinagar Depot G124",
       currency: "INR",
@@ -131,11 +141,11 @@ async function handleRegisterUser(sql: ReturnType<typeof getSql>, payload: Regis
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "Enter a valid email address." };
   if (payload.password.length < 6) return { ok: false, error: "Password must be at least 6 characters." };
 
-  const existing = await sql`SELECT id FROM users WHERE LOWER(email) = ${email} LIMIT 1`;
+  const existing = (await sql`SELECT id FROM users WHERE LOWER(email) = ${email} LIMIT 1`) as any[];
   if (existing.length > 0) return { ok: false, error: "An account with this email already exists." };
 
   const user: User = { id: uid("usr"), name, email, password: payload.password, role: payload.role };
-  await sql`INSERT INTO users ${sql(toSnake(user as unknown as Record<string, unknown>))}`;
+  await insert(sql, "users", user as unknown as Record<string, unknown>);
   return { ok: true, data: user };
 }
 
@@ -143,21 +153,21 @@ async function handleAddVehicle(sql: ReturnType<typeof getSql>, payload: Omit<Ve
   const reg = payload.registrationNo.trim().toUpperCase();
   if (!reg) return { ok: false, error: "Registration number is required." };
 
-  const existing = await sql`SELECT id FROM vehicles WHERE UPPER(registration_no) = ${reg} LIMIT 1`;
+  const existing = (await sql`SELECT id FROM vehicles WHERE UPPER(registration_no) = ${reg} LIMIT 1`) as any[];
   if (existing.length > 0) return { ok: false, error: `Registration ${reg} already exists.` };
 
   const vehicle: Vehicle = { ...payload, registrationNo: reg, id: uid("veh"), createdAt: now() };
-  await sql`INSERT INTO vehicles ${sql(toSnake(vehicle as unknown as Record<string, unknown>))}`;
+  await insert(sql, "vehicles", vehicle as unknown as Record<string, unknown>);
   return { ok: true, data: vehicle };
 }
 
 async function handleUpdateVehicle(sql: ReturnType<typeof getSql>, id: string, patch: Partial<Vehicle>) {
-  const rows = await sql`SELECT * FROM vehicles WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM vehicles WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Vehicle not found." };
 
   if (patch.registrationNo) {
     const reg = patch.registrationNo.trim().toUpperCase();
-    const dup = await sql`SELECT id FROM vehicles WHERE id != ${id} AND UPPER(registration_no) = ${reg} LIMIT 1`;
+    const dup = (await sql`SELECT id FROM vehicles WHERE id != ${id} AND UPPER(registration_no) = ${reg} LIMIT 1`) as any[];
     if (dup.length > 0) return { ok: false, error: `Registration ${reg} already exists.` };
     patch.registrationNo = reg;
   }
@@ -172,7 +182,7 @@ async function handleUpdateVehicle(sql: ReturnType<typeof getSql>, id: string, p
   const setClause = keys.map((k, i) => `${k} = $${i + 2}`).join(", ");
   const values = Object.values(snake);
 
-  await sql.unsafe(
+  await sql.query(
     `UPDATE vehicles SET ${setClause} WHERE id = $1`,
     [id, ...values],
   );
@@ -181,12 +191,12 @@ async function handleUpdateVehicle(sql: ReturnType<typeof getSql>, id: string, p
 }
 
 async function handleDeleteVehicle(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM vehicles WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM vehicles WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Vehicle not found." };
   const v = toCamel(rows[0]) as unknown as Vehicle;
   if (v.status === "ON_TRIP") return { ok: false, error: "Cannot delete a vehicle that is on a trip." };
 
-  const activeTrip = await sql`SELECT id FROM trips WHERE vehicle_id = ${id} AND (status = 'DISPATCHED' OR status = 'DRAFT') LIMIT 1`;
+  const activeTrip = (await sql`SELECT id FROM trips WHERE vehicle_id = ${id} AND (status = 'DISPATCHED' OR status = 'DRAFT') LIMIT 1`) as any[];
   if (activeTrip.length > 0) return { ok: false, error: "Vehicle is linked to active/draft trips." };
 
   await sql`DELETE FROM vehicles WHERE id = ${id}`;
@@ -197,21 +207,21 @@ async function handleAddDriver(sql: ReturnType<typeof getSql>, payload: Omit<Dri
   const lic = payload.licenseNumber.trim().toUpperCase();
   if (!lic) return { ok: false, error: "License number is required." };
 
-  const existing = await sql`SELECT id FROM drivers WHERE UPPER(license_number) = ${lic} LIMIT 1`;
+  const existing = (await sql`SELECT id FROM drivers WHERE UPPER(license_number) = ${lic} LIMIT 1`) as any[];
   if (existing.length > 0) return { ok: false, error: `License ${lic} already exists.` };
 
   const driver: Driver = { ...payload, licenseNumber: lic, id: uid("drv"), createdAt: now() };
-  await sql`INSERT INTO drivers ${sql(toSnake(driver as unknown as Record<string, unknown>))}`;
+  await insert(sql, "drivers", driver as unknown as Record<string, unknown>);
   return { ok: true, data: driver };
 }
 
 async function handleUpdateDriver(sql: ReturnType<typeof getSql>, id: string, patch: Partial<Driver>) {
-  const rows = await sql`SELECT * FROM drivers WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM drivers WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Driver not found." };
 
   if (patch.licenseNumber) {
     const lic = patch.licenseNumber.trim().toUpperCase();
-    const dup = await sql`SELECT id FROM drivers WHERE id != ${id} AND UPPER(license_number) = ${lic} LIMIT 1`;
+    const dup = (await sql`SELECT id FROM drivers WHERE id != ${id} AND UPPER(license_number) = ${lic} LIMIT 1`) as any[];
     if (dup.length > 0) return { ok: false, error: `License ${lic} already exists.` };
     patch.licenseNumber = lic;
   }
@@ -226,7 +236,7 @@ async function handleUpdateDriver(sql: ReturnType<typeof getSql>, id: string, pa
   const setClause = keys.map((k, i) => `${k} = $${i + 2}`).join(", ");
   const values = Object.values(snake);
 
-  await sql.unsafe(
+  await sql.query(
     `UPDATE drivers SET ${setClause} WHERE id = $1`,
     [id, ...values],
   );
@@ -235,7 +245,7 @@ async function handleUpdateDriver(sql: ReturnType<typeof getSql>, id: string, pa
 }
 
 async function handleDeleteDriver(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM drivers WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM drivers WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Driver not found." };
   const d = toCamel(rows[0]) as unknown as Driver;
   if (d.status === "ON_TRIP") return { ok: false, error: "Cannot delete a driver that is on a trip." };
@@ -252,13 +262,13 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
 
   let vehicle: Vehicle | null = null;
   if (payload.vehicleId) {
-    const vRows = await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`;
+    const vRows = (await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`) as any[];
     if (vRows.length > 0) vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   }
 
   let driver: Driver | null = null;
   if (payload.driverId) {
-    const dRows = await sql`SELECT * FROM drivers WHERE id = ${payload.driverId} LIMIT 1`;
+    const dRows = (await sql`SELECT * FROM drivers WHERE id = ${payload.driverId} LIMIT 1`) as any[];
     if (dRows.length > 0) driver = toCamel(dRows[0]) as unknown as Driver;
   }
 
@@ -276,7 +286,7 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
     }
   }
 
-  const tripCodeRow = await sql`SELECT code FROM trips WHERE code ~ 'TRIP-\\d+' ORDER BY code DESC LIMIT 1`;
+  const tripCodeRow = (await sql`SELECT code FROM trips WHERE code ~ 'TRIP-\\d+' ORDER BY code DESC LIMIT 1`) as any[];
   let nextNum = 1;
   if (tripCodeRow.length > 0) {
     const m = /TRIP-(\d+)/.exec(tripCodeRow[0].code as string);
@@ -306,7 +316,7 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
     completedAt: null,
   };
 
-  await sql`INSERT INTO trips ${sql(toSnake(trip as unknown as Record<string, unknown>))}`;
+  await insert(sql, "trips", trip as unknown as Record<string, unknown>);
 
   if (dispatching && vehicle) {
     await sql`UPDATE vehicles SET status = 'ON_TRIP' WHERE id = ${vehicle.id}`;
@@ -319,7 +329,7 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
 }
 
 async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
   const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status !== "DRAFT") return { ok: false, error: "Only draft trips can be dispatched." };
@@ -327,12 +337,12 @@ async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
   if (!trip.vehicleId) return { ok: false, error: "Assign an available vehicle before dispatching." };
   if (!trip.driverId) return { ok: false, error: "Assign an available driver before dispatching." };
 
-  const vRows = await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`;
+  const vRows = (await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`) as any[];
   if (vRows.length === 0) return { ok: false, error: "Assigned vehicle not found." };
   const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   if (vehicle.status !== "AVAILABLE") return { ok: false, error: `${vehicle.registrationNo} is ${vehicle.status} and cannot be dispatched.` };
 
-  const dRows = await sql`SELECT * FROM drivers WHERE id = ${trip.driverId} LIMIT 1`;
+  const dRows = (await sql`SELECT * FROM drivers WHERE id = ${trip.driverId} LIMIT 1`) as any[];
   if (dRows.length === 0) return { ok: false, error: "Assigned driver not found." };
   const driver = toCamel(dRows[0]) as unknown as Driver;
   if (driver.status !== "AVAILABLE" || isExpired(driver.licenseExpiry)) {
@@ -354,13 +364,13 @@ async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
 }
 
 async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, input: CompleteTripInput) {
-  const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
   const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status !== "DISPATCHED") return { ok: false, error: "Only dispatched trips can be completed." };
 
   if (trip.vehicleId) {
-    const vRows = await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`;
+    const vRows = (await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`) as any[];
     if (vRows.length > 0) {
       const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
       if (input.endOdometer < (trip.startOdometer ?? vehicle.odometer)) {
@@ -380,8 +390,8 @@ async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, in
   }
 
   if (input.fuelLiters > 0) {
-    const settingsRows = await sql`SELECT * FROM settings WHERE id = 1 LIMIT 1`;
-    const settings = mapRow<Settings>(settingsRows[0]) ?? { fuelPricePerLiter: 104.5 } as Settings;
+    const settingsRows = (await sql`SELECT * FROM settings WHERE id = 1 LIMIT 1`) as any[];
+    const settings = mapRow<Settings>((settingsRows as any[])[0]) ?? { fuelPricePerLiter: 104.5 } as Settings;
     const expense: Expense = {
       id: uid("exp"),
       type: "FUEL",
@@ -393,7 +403,7 @@ async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, in
       description: `Fuel for ${trip.source} to ${trip.destination}`,
       createdAt: nowIso,
     };
-    await sql`INSERT INTO expenses ${sql(toSnake(expense as unknown as Record<string, unknown>))}`;
+    await insert(sql, "expenses", expense as unknown as Record<string, unknown>);
   }
 
   const updated: Trip = { ...trip, status: "COMPLETED", completedAt: nowIso, endOdometer: input.endOdometer, fuelLiters: input.fuelLiters };
@@ -401,7 +411,7 @@ async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, in
 }
 
 async function handleCancelTrip(sql: ReturnType<typeof getSql>, id: string, note?: string) {
-  const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
   const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status === "COMPLETED" || trip.status === "CANCELLED") {
@@ -425,7 +435,7 @@ async function handleCancelTrip(sql: ReturnType<typeof getSql>, id: string, note
 }
 
 async function handleDeleteTrip(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
   const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status === "DISPATCHED") return { ok: false, error: "Cancel the trip before deleting it." };
@@ -435,14 +445,14 @@ async function handleDeleteTrip(sql: ReturnType<typeof getSql>, id: string) {
 }
 
 async function handleAddMaintenance(sql: ReturnType<typeof getSql>, payload: Omit<MaintenanceLog, "id" | "createdAt">) {
-  const vRows = await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`;
+  const vRows = (await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`) as any[];
   if (vRows.length === 0) return { ok: false, error: "Select a vehicle for the maintenance log." };
   const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   if (vehicle.status === "ON_TRIP") return { ok: false, error: `${vehicle.registrationNo} is on a trip. Complete the trip first.` };
   if (vehicle.status === "RETIRED") return { ok: false, error: `${vehicle.registrationNo} is retired.` };
 
   const log: MaintenanceLog = { ...payload, id: uid("mnt"), createdAt: now() };
-  await sql`INSERT INTO maintenance ${sql(toSnake(log as unknown as Record<string, unknown>))}`;
+  await insert(sql, "maintenance", log as unknown as Record<string, unknown>);
 
   if (payload.status === "ACTIVE") {
     await sql`UPDATE vehicles SET status = 'IN_SHOP' WHERE id = ${payload.vehicleId}`;
@@ -452,14 +462,14 @@ async function handleAddMaintenance(sql: ReturnType<typeof getSql>, payload: Omi
 }
 
 async function handleCompleteMaintenance(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Maintenance log not found." };
   const log = toCamel(rows[0]) as unknown as MaintenanceLog;
   if (log.status === "COMPLETED") return { ok: false, error: "This log is already completed." };
 
   await sql`UPDATE maintenance SET status = 'COMPLETED' WHERE id = ${id}`;
 
-  const stillActive = await sql`SELECT id FROM maintenance WHERE id != ${id} AND vehicle_id = ${log.vehicleId} AND status = 'ACTIVE' LIMIT 1`;
+  const stillActive = (await sql`SELECT id FROM maintenance WHERE id != ${id} AND vehicle_id = ${log.vehicleId} AND status = 'ACTIVE' LIMIT 1`) as any[];
   if (stillActive.length === 0) {
     await sql`UPDATE vehicles SET status = 'AVAILABLE' WHERE id = ${log.vehicleId} AND status = 'IN_SHOP'`;
   }
@@ -469,12 +479,12 @@ async function handleCompleteMaintenance(sql: ReturnType<typeof getSql>, id: str
 }
 
 async function handleDeleteMaintenance(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Maintenance log not found." };
   const log = toCamel(rows[0]) as unknown as MaintenanceLog;
 
   if (log.status === "ACTIVE") {
-    const stillActive = await sql`SELECT id FROM maintenance WHERE id != ${id} AND vehicle_id = ${log.vehicleId} AND status = 'ACTIVE' LIMIT 1`;
+    const stillActive = (await sql`SELECT id FROM maintenance WHERE id != ${id} AND vehicle_id = ${log.vehicleId} AND status = 'ACTIVE' LIMIT 1`) as any[];
     if (stillActive.length === 0) {
       await sql`UPDATE vehicles SET status = 'AVAILABLE' WHERE id = ${log.vehicleId} AND status = 'IN_SHOP'`;
     }
@@ -487,12 +497,12 @@ async function handleDeleteMaintenance(sql: ReturnType<typeof getSql>, id: strin
 async function handleAddExpense(sql: ReturnType<typeof getSql>, payload: Omit<Expense, "id" | "createdAt">) {
   if (payload.amount <= 0) return { ok: false, error: "Amount must be greater than zero." };
   const expense: Expense = { ...payload, id: uid("exp"), createdAt: now() };
-  await sql`INSERT INTO expenses ${sql(toSnake(expense as unknown as Record<string, unknown>))}`;
+  await insert(sql, "expenses", expense as unknown as Record<string, unknown>);
   return { ok: true, data: expense };
 }
 
 async function handleDeleteExpense(sql: ReturnType<typeof getSql>, id: string) {
-  const rows = await sql`SELECT id FROM expenses WHERE id = ${id} LIMIT 1`;
+  const rows = (await sql`SELECT id FROM expenses WHERE id = ${id} LIMIT 1`) as any[];
   if (rows.length === 0) return { ok: false, error: "Expense not found." };
   await sql`DELETE FROM expenses WHERE id = ${id}`;
   return { ok: true };
@@ -506,13 +516,13 @@ async function handleUpdateSettings(sql: ReturnType<typeof getSql>, payload: Par
   const setClause = keys.map((k, i) => `${k} = $${i + 1}`).join(", ");
   const values = Object.values(snake);
 
-  await sql.unsafe(
+  await sql.query(
     `UPDATE settings SET ${setClause} WHERE id = 1`,
     values,
   );
 
-  const settingsRows = await sql`SELECT * FROM settings WHERE id = 1 LIMIT 1`;
-  const settings = mapRow<Settings>(settingsRows[0])!;
+  const settingsRows = (await sql`SELECT * FROM settings WHERE id = 1 LIMIT 1`) as any[];
+  const settings = mapRow<Settings>((settingsRows as any[])[0])!;
   return { ok: true, data: settings };
 }
 
@@ -528,7 +538,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
 
   // Insert seed users
   for (const u of SEED_USERS) {
-    await sql`INSERT INTO users ${sql(toSnake(u as unknown as Record<string, unknown>))}`;
+    await insert(sql, "users", u as unknown as Record<string, unknown>);
   }
 
   // Build vehicles with status derivations
@@ -540,7 +550,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
   }));
 
   for (const v of vehicles) {
-    await sql`INSERT INTO vehicles ${sql(toSnake(v as unknown as Record<string, unknown>))}`;
+    await insert(sql, "vehicles", v as unknown as Record<string, unknown>);
   }
 
   // Seed drivers
@@ -569,7 +579,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
   }));
 
   for (const d of drivers) {
-    await sql`INSERT INTO drivers ${sql(toSnake(d as unknown as Record<string, unknown>))}`;
+    await insert(sql, "drivers", d as unknown as Record<string, unknown>);
   }
 
   // Seed trips
@@ -622,7 +632,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
   }
 
   for (const t of trips) {
-    await sql`INSERT INTO trips ${sql(toSnake(t as unknown as Record<string, unknown>))}`;
+    await insert(sql, "trips", t as unknown as Record<string, unknown>);
   }
 
   // Seed maintenance
@@ -650,7 +660,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
       notes: m.notes,
       createdAt: m.date,
     };
-    await sql`INSERT INTO maintenance ${sql(toSnake(log as unknown as Record<string, unknown>))}`;
+    await insert(sql, "maintenance", log as unknown as Record<string, unknown>);
   }
 
   // Seed expenses
@@ -691,7 +701,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
       description: e.description,
       createdAt: e.date,
     };
-    await sql`INSERT INTO expenses ${sql(toSnake(expense as unknown as Record<string, unknown>))}`;
+    await insert(sql, "expenses", expense as unknown as Record<string, unknown>);
   }
 
   // Derive statuses for active maintenance and dispatched trips
