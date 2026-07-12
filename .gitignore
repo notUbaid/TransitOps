@@ -40,3 +40,6 @@ build
 
 # Vercel
 .vercel
+
+# Next.js
+.next
