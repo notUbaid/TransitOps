@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { getSql } from "./_db";
-import type { ApiRequest } from "./_types";
+import { getSql } from "./_db.js";
+import type { ApiRequest } from "./_types.js";
 
 // ---- Domain types (mirrored from client for API use) ----
 
