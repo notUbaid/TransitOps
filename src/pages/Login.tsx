@@ -59,8 +59,8 @@ export function Login() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
       {/* Ambient background */}
       <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute -left-[5%] top-[10%] h-[45%] w-[45%] rounded-full bg-primary-container/40 blur-[130px]" />
-        <div className="absolute -right-[5%] bottom-[5%] h-[40%] w-[40%] rounded-full bg-tertiary-container/30 blur-[130px]" />
+        <div className="absolute left-[-5%] top-[10%] h-[45%] w-[45%] rounded-full bg-primary-container/40 blur-[130px]" />
+        <div className="absolute right-[-5%] bottom-[5%] h-[40%] w-[40%] rounded-full bg-tertiary-container/30 blur-[130px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">

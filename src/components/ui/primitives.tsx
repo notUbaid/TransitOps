@@ -61,10 +61,18 @@ export function Button({
 export function Card({
   className,
   children,
+  interactive,
   ...props
-}: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+}: { className?: string; children: ReactNode; interactive?: boolean } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("glass rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20", className)} {...props}>
+    <div
+      className={cn(
+        "glass rounded-xl",
+        interactive && "transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

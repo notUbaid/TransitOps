@@ -55,8 +55,8 @@ export function Trips() {
   const [cancelId, setCancelId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const availableVehicles = store.dispatchableVehicles();
-  const availableDrivers = store.dispatchableDrivers();
+  const availableVehicles = useMemo(() => store.dispatchableVehicles(), [store]);
+  const availableDrivers = useMemo(() => store.dispatchableDrivers(), [store]);
 
   const selectedVehicle = vehicleById(form.vehicleId || null);
   const capacityExceeded = !!selectedVehicle && form.cargoKg > selectedVehicle.capacityKg;
@@ -188,22 +188,22 @@ export function Trips() {
             cell: (t: Trip) => (
               <div className="flex items-center justify-end gap-1">
                 {t.status === "DRAFT" && (
-                  <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Dispatch">
+                  <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Dispatch" aria-label="Dispatch trip">
                     <Icon name="send" size={18} />
                   </button>
                 )}
                 {t.status === "DISPATCHED" && (
-                  <button onClick={() => openComplete(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-emerald-300" title="Complete">
+                  <button onClick={() => openComplete(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-emerald-300" title="Complete" aria-label="Complete trip">
                     <Icon name="check_circle" size={18} />
                   </button>
                 )}
                 {(t.status === "DRAFT" || t.status === "DISPATCHED") && (
-                  <button onClick={() => setCancelId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Cancel">
+                  <button onClick={() => setCancelId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Cancel" aria-label="Cancel trip">
                     <Icon name="block" size={18} />
                   </button>
                 )}
                 {t.status !== "DISPATCHED" && (
-                  <button onClick={() => setDeleteId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Delete">
+                  <button onClick={() => setDeleteId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Delete" aria-label="Delete trip">
                     <Icon name="delete" size={18} />
                   </button>
                 )}

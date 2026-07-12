@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { useToast } from "@/components/ui/Toast";
@@ -17,6 +17,11 @@ export function Settings() {
 
   const [form, setForm] = useState<SettingsType>(db.settings);
   const [resetOpen, setResetOpen] = useState(false);
+
+  // Sync form when db.settings changes (e.g. after demo reset)
+  useEffect(() => {
+    setForm(db.settings);
+  }, [db.settings]);
 
   const save = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +90,17 @@ export function Settings() {
               </Field>
               <Field label="Service Alert (km)">
                 <Input type="number" min={0} disabled={!editable} value={form.maintenanceAlertKm} onChange={(e) => setForm({ ...form, maintenanceAlertKm: Number(e.target.value) })} />
+              </Field>
+            </div>
+            <Field label="GST Rate (%)">
+              <Input type="number" min={0} max={100} step="0.1" disabled={!editable} value={form.gstRate} onChange={(e) => setForm({ ...form, gstRate: Number(e.target.value) })} />
+            </Field>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field label="Contact Email">
+                <Input type="email" disabled={!editable} value={form.contactEmail} onChange={(e) => setForm({ ...form, contactEmail: e.target.value })} placeholder="ops@company.com" />
+              </Field>
+              <Field label="Contact Phone">
+                <Input type="tel" disabled={!editable} value={form.contactPhone} onChange={(e) => setForm({ ...form, contactPhone: e.target.value })} placeholder="+91 98765 43210" />
               </Field>
             </div>
             {editable && (

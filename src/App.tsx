@@ -7,7 +7,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { RequireAuth, RequireModule } from "@/components/layout/guards";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Spinner, DashboardSkeleton } from "@/components/ui/primitives";
+import { DashboardSkeleton } from "@/components/ui/primitives";
 import type { ModuleKey } from "@/lib/rbac";
 
 import { Login } from "@/pages/Login";

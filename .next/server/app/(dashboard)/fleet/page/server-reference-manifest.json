@@ -1,0 +1,41 @@
+{
+  "node": {
+    "002c8d973335dd54f2f51f4c031857f9038901dd4a": {
+      "workers": {
+        "app/(dashboard)/fleet/page": {
+          "moduleId": 46312,
+          "async": true,
+          "exportedName": "getVehicles",
+          "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+        }
+      },
+      "exportedName": "getVehicles",
+      "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+    },
+    "40a3fafa685f2693908948cc73e6053a6ceeed9dfd": {
+      "workers": {
+        "app/(dashboard)/fleet/page": {
+          "moduleId": 46312,
+          "async": true,
+          "exportedName": "createVehicle",
+          "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+        }
+      },
+      "exportedName": "createVehicle",
+      "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+    },
+    "40de59f069c0197a222af0a97ae0d10b8b3f3b9b75": {
+      "workers": {
+        "app/(dashboard)/fleet/page": {
+          "moduleId": 46312,
+          "async": true,
+          "exportedName": "deleteVehicle",
+          "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+        }
+      },
+      "exportedName": "deleteVehicle",
+      "filename": "OneDrive/Desktop/Projects/TransitOps/src/server/actions/vehicle.actions.ts"
+    }
+  },
+  "edge": {}
+}

@@ -54,11 +54,15 @@ export function vehicleRevenue(db: Database, vehicleId: string): number {
     .reduce((s, t) => s + t.revenue, 0);
 }
 
-/** ROI = (Revenue − Operating Cost) / Acquisition Cost. Guards divide-by-zero. */
+/** ROI = (Revenue − (Maintenance + Fuel)) / Acquisition Cost per spec §3.8. */
 export function vehicleRoi(db: Database, vehicle: Vehicle): number {
   if (!vehicle.acquisitionCost) return 0;
-  const profit = vehicleRevenue(db, vehicle.id) - vehicleOperatingCost(db, vehicle.id);
-  return (profit / vehicle.acquisitionCost) * 100;
+  const maintenanceCost = db.maintenance
+    .filter((m) => m.vehicleId === vehicle.id)
+    .reduce((s, m) => s + m.cost, 0);
+  const fuelCost = vehicleFuelCost(db, vehicle.id);
+  const revenue = vehicleRevenue(db, vehicle.id);
+  return ((revenue - maintenanceCost - fuelCost) / vehicle.acquisitionCost) * 100;
 }
 
 export function fleetRoi(db: Database): number {

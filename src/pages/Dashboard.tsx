@@ -103,7 +103,7 @@ export function Dashboard() {
           footnote={`${drivers.available} available`}
         />
         <KpiCard label="Available Vehicles" value={fleet.available} icon="check_circle" accent="emerald" />
-        <KpiCard label="On Trip" value={fleet.onTrip} icon="local_shipping" accent="primary" />
+        <KpiCard label="Active Vehicles" value={fleet.onTrip} icon="local_shipping" accent="primary" footnote="Currently on trip" />
         <KpiCard label="In Maintenance" value={fleet.inShop} icon="build" accent="tertiary" />
         <KpiCard
           label="Revenue (Completed)"
