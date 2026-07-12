@@ -117,6 +117,7 @@ export function Maintenance() {
   const columns: Column<MaintenanceLog>[] = [
     {
       header: "Vehicle",
+      sortValue: (m) => vehicleById(m.vehicleId)?.registrationNo,
       cell: (m) => {
         const v = vehicleById(m.vehicleId);
         return (
@@ -127,11 +128,11 @@ export function Maintenance() {
         );
       },
     },
-    { header: "Service", cell: (m) => m.serviceType },
-    { header: "Cost", cell: (m) => formatCurrency(m.cost, db.settings.currency), className: "hidden sm:table-cell" },
-    { header: "Date", cell: (m) => formatDate(m.serviceDate), className: "hidden md:table-cell" },
-    { header: "Notes", cell: (m) => <span className="text-on-surface-variant">{m.notes}</span>, className: "hidden xl:table-cell max-w-xs truncate" },
-    { header: "Status", cell: (m) => <StatusBadge status={m.status} /> },
+    { header: "Service", sortValue: (m) => m.serviceType, cell: (m) => m.serviceType },
+    { header: "Cost", sortValue: (m) => m.cost, cell: (m) => formatCurrency(m.cost, db.settings.currency), className: "hidden sm:table-cell" },
+    { header: "Date", sortValue: (m) => m.serviceDate, cell: (m) => formatDate(m.serviceDate), className: "hidden md:table-cell" },
+    { header: "Notes", sortValue: (m) => m.notes, cell: (m) => <span className="text-on-surface-variant">{m.notes}</span>, className: "hidden xl:table-cell max-w-xs truncate" },
+    { header: "Status", sortValue: (m) => m.status, cell: (m) => <StatusBadge status={m.status} /> },
     ...(editable
       ? [
           {
@@ -197,6 +198,7 @@ export function Maintenance() {
           columns={columns}
           rows={rows}
           rowKey={(m) => m.id}
+          pageSize={10}
           empty={
             <EmptyState
               icon="build"

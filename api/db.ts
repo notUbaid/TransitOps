@@ -162,7 +162,7 @@ async function handleUpdateVehicle(sql: ReturnType<typeof getSql>, id: string, p
     patch.registrationNo = reg;
   }
 
-  const existing = toCamel(rows[0]) as Vehicle;
+  const existing = toCamel(rows[0]) as unknown as Vehicle;
   const updated = { ...existing, ...patch };
   const snake = toSnake(updated as unknown as Record<string, unknown>);
   delete snake.id;
@@ -183,7 +183,7 @@ async function handleUpdateVehicle(sql: ReturnType<typeof getSql>, id: string, p
 async function handleDeleteVehicle(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM vehicles WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Vehicle not found." };
-  const v = toCamel(rows[0]) as Vehicle;
+  const v = toCamel(rows[0]) as unknown as Vehicle;
   if (v.status === "ON_TRIP") return { ok: false, error: "Cannot delete a vehicle that is on a trip." };
 
   const activeTrip = await sql`SELECT id FROM trips WHERE vehicle_id = ${id} AND (status = 'DISPATCHED' OR status = 'DRAFT') LIMIT 1`;
@@ -216,7 +216,7 @@ async function handleUpdateDriver(sql: ReturnType<typeof getSql>, id: string, pa
     patch.licenseNumber = lic;
   }
 
-  const existing = toCamel(rows[0]) as Driver;
+  const existing = toCamel(rows[0]) as unknown as Driver;
   const updated = { ...existing, ...patch };
   const snake = toSnake(updated as unknown as Record<string, unknown>);
   delete snake.id;
@@ -237,7 +237,7 @@ async function handleUpdateDriver(sql: ReturnType<typeof getSql>, id: string, pa
 async function handleDeleteDriver(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM drivers WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Driver not found." };
-  const d = toCamel(rows[0]) as Driver;
+  const d = toCamel(rows[0]) as unknown as Driver;
   if (d.status === "ON_TRIP") return { ok: false, error: "Cannot delete a driver that is on a trip." };
 
   await sql`DELETE FROM drivers WHERE id = ${id}`;
@@ -253,13 +253,13 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
   let vehicle: Vehicle | null = null;
   if (payload.vehicleId) {
     const vRows = await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`;
-    if (vRows.length > 0) vehicle = toCamel(vRows[0]) as Vehicle;
+    if (vRows.length > 0) vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   }
 
   let driver: Driver | null = null;
   if (payload.driverId) {
     const dRows = await sql`SELECT * FROM drivers WHERE id = ${payload.driverId} LIMIT 1`;
-    if (dRows.length > 0) driver = toCamel(dRows[0]) as Driver;
+    if (dRows.length > 0) driver = toCamel(dRows[0]) as unknown as Driver;
   }
 
   if (vehicle && payload.cargoKg > vehicle.capacityKg) {
@@ -321,7 +321,7 @@ async function handleCreateTrip(sql: ReturnType<typeof getSql>, payload: CreateT
 async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
-  const trip = toCamel(rows[0]) as Trip;
+  const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status !== "DRAFT") return { ok: false, error: "Only draft trips can be dispatched." };
 
   if (!trip.vehicleId) return { ok: false, error: "Assign an available vehicle before dispatching." };
@@ -329,12 +329,12 @@ async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
 
   const vRows = await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`;
   if (vRows.length === 0) return { ok: false, error: "Assigned vehicle not found." };
-  const vehicle = toCamel(vRows[0]) as Vehicle;
+  const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   if (vehicle.status !== "AVAILABLE") return { ok: false, error: `${vehicle.registrationNo} is ${vehicle.status} and cannot be dispatched.` };
 
   const dRows = await sql`SELECT * FROM drivers WHERE id = ${trip.driverId} LIMIT 1`;
   if (dRows.length === 0) return { ok: false, error: "Assigned driver not found." };
-  const driver = toCamel(dRows[0]) as Driver;
+  const driver = toCamel(dRows[0]) as unknown as Driver;
   if (driver.status !== "AVAILABLE" || isExpired(driver.licenseExpiry)) {
     const reason = isExpired(driver.licenseExpiry) ? "has an expired license" : `is ${driver.status}`;
     return { ok: false, error: `${driver.name} ${reason} and cannot be assigned.` };
@@ -356,13 +356,13 @@ async function handleDispatchTrip(sql: ReturnType<typeof getSql>, id: string) {
 async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, input: CompleteTripInput) {
   const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
-  const trip = toCamel(rows[0]) as Trip;
+  const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status !== "DISPATCHED") return { ok: false, error: "Only dispatched trips can be completed." };
 
   if (trip.vehicleId) {
     const vRows = await sql`SELECT * FROM vehicles WHERE id = ${trip.vehicleId} LIMIT 1`;
     if (vRows.length > 0) {
-      const vehicle = toCamel(vRows[0]) as Vehicle;
+      const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
       if (input.endOdometer < (trip.startOdometer ?? vehicle.odometer)) {
         return { ok: false, error: "Final odometer must be greater than the start odometer." };
       }
@@ -403,7 +403,7 @@ async function handleCompleteTrip(sql: ReturnType<typeof getSql>, id: string, in
 async function handleCancelTrip(sql: ReturnType<typeof getSql>, id: string, note?: string) {
   const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
-  const trip = toCamel(rows[0]) as Trip;
+  const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status === "COMPLETED" || trip.status === "CANCELLED") {
     return { ok: false, error: "This trip can no longer be cancelled." };
   }
@@ -427,7 +427,7 @@ async function handleCancelTrip(sql: ReturnType<typeof getSql>, id: string, note
 async function handleDeleteTrip(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM trips WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Trip not found." };
-  const trip = toCamel(rows[0]) as Trip;
+  const trip = toCamel(rows[0]) as unknown as Trip;
   if (trip.status === "DISPATCHED") return { ok: false, error: "Cancel the trip before deleting it." };
 
   await sql`DELETE FROM trips WHERE id = ${id}`;
@@ -437,7 +437,7 @@ async function handleDeleteTrip(sql: ReturnType<typeof getSql>, id: string) {
 async function handleAddMaintenance(sql: ReturnType<typeof getSql>, payload: Omit<MaintenanceLog, "id" | "createdAt">) {
   const vRows = await sql`SELECT * FROM vehicles WHERE id = ${payload.vehicleId} LIMIT 1`;
   if (vRows.length === 0) return { ok: false, error: "Select a vehicle for the maintenance log." };
-  const vehicle = toCamel(vRows[0]) as Vehicle;
+  const vehicle = toCamel(vRows[0]) as unknown as Vehicle;
   if (vehicle.status === "ON_TRIP") return { ok: false, error: `${vehicle.registrationNo} is on a trip. Complete the trip first.` };
   if (vehicle.status === "RETIRED") return { ok: false, error: `${vehicle.registrationNo} is retired.` };
 
@@ -454,7 +454,7 @@ async function handleAddMaintenance(sql: ReturnType<typeof getSql>, payload: Omi
 async function handleCompleteMaintenance(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Maintenance log not found." };
-  const log = toCamel(rows[0]) as MaintenanceLog;
+  const log = toCamel(rows[0]) as unknown as MaintenanceLog;
   if (log.status === "COMPLETED") return { ok: false, error: "This log is already completed." };
 
   await sql`UPDATE maintenance SET status = 'COMPLETED' WHERE id = ${id}`;
@@ -471,7 +471,7 @@ async function handleCompleteMaintenance(sql: ReturnType<typeof getSql>, id: str
 async function handleDeleteMaintenance(sql: ReturnType<typeof getSql>, id: string) {
   const rows = await sql`SELECT * FROM maintenance WHERE id = ${id} LIMIT 1`;
   if (rows.length === 0) return { ok: false, error: "Maintenance log not found." };
-  const log = toCamel(rows[0]) as MaintenanceLog;
+  const log = toCamel(rows[0]) as unknown as MaintenanceLog;
 
   if (log.status === "ACTIVE") {
     const stillActive = await sql`SELECT id FROM maintenance WHERE id != ${id} AND vehicle_id = ${log.vehicleId} AND status = 'ACTIVE' LIMIT 1`;
@@ -614,7 +614,7 @@ async function handleResetDemoData(sql: ReturnType<typeof getSql>) {
       endOdometer: t.eo ?? null,
       fuelLiters: t.fl ?? null,
       note: t.note ?? null,
-      createdAt: t.da ?? nowIso,
+      createdAt: t.da ?? now(),
       dispatchedAt: (t.status === "DISPATCHED" || t.status === "COMPLETED") ? (t.da ?? null) : null,
       completedAt: t.ca ?? null,
     };
