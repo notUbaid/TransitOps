@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚚 TransitOps
+# TransitOps
 ### Smart Transport Operations Platform
 
 <p align="center">
@@ -16,7 +16,7 @@ A modern fleet management platform that digitizes transport operations, vehicle 
 
 ---
 
-# 📖 Overview
+# Overview
 
 TransitOps is an intelligent transport management platform designed to replace manual spreadsheets and logbooks with a centralized digital solution.
 
@@ -24,7 +24,7 @@ The system enables organizations to efficiently manage their fleet by tracking v
 
 ---
 
-# 🚀 Problem Statement
+# Problem Statement
 
 Many logistics companies still rely on spreadsheets and manual processes for managing transport operations. This often results in:
 
@@ -40,9 +40,9 @@ TransitOps solves these problems through automation, validation rules, and real-
 
 ---
 
-# ✨ Features
+# Features
 
-## 🔐 Authentication
+## Authentication
 
 - Secure Login
 - Email Authentication
@@ -50,7 +50,7 @@ TransitOps solves these problems through automation, validation rules, and real-
 
 ---
 
-## 🚚 Fleet Management
+## Fleet Management
 
 - Vehicle Registration
 - Vehicle Status Tracking
@@ -61,7 +61,7 @@ TransitOps solves these problems through automation, validation rules, and real-
 
 ---
 
-## 👨‍✈️ Driver Management
+## Driver Management
 
 - Driver Registration
 - License Validation
@@ -72,7 +72,7 @@ TransitOps solves these problems through automation, validation rules, and real-
 
 ---
 
-## 📦 Trip Management
+## Trip Management
 
 - Trip Creation
 - Vehicle Assignment
@@ -81,7 +81,7 @@ TransitOps solves these problems through automation, validation rules, and real-
 - Route Information
 - Trip Lifecycle
 
-```
+```text
 Draft
    ↓
 Dispatched
@@ -95,7 +95,7 @@ Cancelled
 
 ---
 
-## 🔧 Maintenance
+## Maintenance
 
 - Maintenance Logs
 - Automatic Vehicle Status Updates
@@ -104,7 +104,7 @@ Cancelled
 
 ---
 
-## ⛽ Fuel & Expense Tracking
+## Fuel & Expense Tracking
 
 - Fuel Logs
 - Fuel Cost
@@ -114,7 +114,7 @@ Cancelled
 
 ---
 
-## 📊 Dashboard
+## Dashboard
 
 Real-time KPIs including:
 
@@ -129,7 +129,7 @@ Real-time KPIs including:
 
 ---
 
-## 📈 Analytics
+## Analytics
 
 - Fuel Efficiency
 - Fleet Utilization
@@ -140,9 +140,9 @@ Real-time KPIs including:
 
 ---
 
-# 🏗️ System Modules
+# System Modules
 
-```
+```text
 Authentication
       │
       ▼
@@ -164,35 +164,25 @@ Vehicles Drivers  Trips
 
 ---
 
-# ⚙️ Business Rules
+# Business Rules
 
-✔ Vehicle Registration Number must be unique.
-
-✔ Vehicles under maintenance cannot be dispatched.
-
-✔ Retired vehicles cannot be assigned.
-
-✔ Suspended drivers cannot drive.
-
-✔ Drivers with expired licenses cannot be assigned.
-
-✔ Vehicle capacity cannot be exceeded.
-
-✔ Vehicle already on trip cannot be assigned.
-
-✔ Driver already on trip cannot be assigned.
-
-✔ Dispatch automatically changes status to **On Trip**.
-
-✔ Completing a trip restores availability.
-
-✔ Closing maintenance restores vehicle status.
+- Vehicle Registration Number must be unique.
+- Vehicles under maintenance cannot be dispatched.
+- Retired vehicles cannot be assigned.
+- Suspended drivers cannot drive.
+- Drivers with expired licenses cannot be assigned.
+- Vehicle capacity cannot be exceeded.
+- Vehicle already on trip cannot be assigned.
+- Driver already on trip cannot be assigned.
+- Dispatch automatically changes status to On Trip.
+- Completing a trip restores availability.
+- Closing maintenance restores vehicle status.
 
 ---
 
-# 📂 Database Design
+# Database Design
 
-```
+```text
 Users
 │
 ├── Roles
@@ -211,7 +201,7 @@ Drivers
 
 ---
 
-# 📊 Dashboard Metrics
+# Dashboard Metrics
 
 - Fleet Utilization
 - Active Trips
@@ -226,7 +216,7 @@ Drivers
 
 ---
 
-# 🛠️ Tech Stack
+# Tech Stack
 
 ## Frontend
 
@@ -254,9 +244,9 @@ Drivers
 
 ---
 
-# 📁 Project Structure
+# Project Structure
 
-```
+```text
 TransitOps/
 
 │── client/
@@ -279,9 +269,9 @@ README.md
 
 ---
 
-# 🔄 Workflow
+# Workflow
 
-```
+```text
 Vehicle Registration
         │
         ▼
@@ -314,7 +304,7 @@ Reports Updated
 
 ---
 
-# 🎯 Future Enhancements
+# Future Enhancements
 
 - PDF Reports
 - Email Notifications
@@ -329,7 +319,7 @@ Reports Updated
 
 ---
 
-## 👨‍💻 Team
+## Team
 
 <p align="center">
   <table>
@@ -338,17 +328,17 @@ Reports Updated
         <div>
           <img src="https://avatars.githubusercontent.com/Sam-bot-dev?s=120" width="120px;" height="120px;" alt="Bhavesh"/>
         </div>
-        <div><strong>🧩 Head Teammate</strong></div>
+        <div><strong>Head Teammate</strong></div>
         <div><strong>Bhavesh</strong></div>
-        <a href="https://github.com/Sam-bot-dev">🌐 GitHub</a>
+        <a href="https://github.com/Sam-bot-dev">GitHub</a>
       </td>
       <td align="center" width="25%">
         <div>
           <img src="https://avatars.githubusercontent.com/notUbaid?s=120" width="120px;" height="120px;" alt="Ubaid khan"/>
         </div>
-        <div><strong>⭐ Team Leader</strong></div>
+        <div><strong>Team Leader</strong></div>
         <div><strong>Ubaid khan</strong></div>
-        <a href="https://github.com/notUbaid">🌐 GitHub</a>
+        <a href="https://github.com/notUbaid">GitHub</a>
       </td>
       <td align="center" width="25%">
         <div>
@@ -356,15 +346,15 @@ Reports Updated
         </div>
         <div><strong>Architecture Designer</strong></div>
         <div><strong>Ved</strong></div>
-        <a href="https://github.com/Destroyerved">🌐 GitHub</a>
+        <a href="https://github.com/Destroyerved">GitHub</a>
       </td>
       <td align="center" width="25%">
         <div>
           <img src="https://avatars.githubusercontent.com/harsheellhu?s=120" width="120px;" height="120px;" alt="Yug"/>
         </div>
-        <div><strong>🗄️ Database Head</strong></div>
+        <div><strong>Database Head</strong></div>
         <div><strong>Harshil</strong></div>
-        <a href="https://github.com/harsheellhu">🌐 GitHub</a>
+        <a href="https://github.com/harsheellhu">GitHub</a>
       </td>
     </tr>
   </table>
@@ -372,13 +362,13 @@ Reports Updated
 
 ---
 
-# 🏆 Hackathon
+# Hackathon
 
 Built for the **Odoo Hackathon** with the objective of creating a centralized transport operations platform capable of managing vehicles, drivers, trips, maintenance, expenses, and operational analytics through a single integrated system.
 
 ---
 
-# 📜 License
+# License
 
 This project is developed for educational and hackathon purposes.
 
@@ -386,8 +376,8 @@ This project is developed for educational and hackathon purposes.
 
 <div align="center">
 
-### ⭐ If you like this project, don't forget to star the repository!
+### If you like this project, don't forget to star the repository!
 
-Made with ❤️ during Hackathon
+Made with love during Hackathon
 
 </div>
