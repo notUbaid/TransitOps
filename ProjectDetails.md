@@ -242,9 +242,9 @@ Vehicle contains
 
 
 
-Registration Number
+Registration No.
 
-Vehicle Name
+Vehicle Name/Model
 
 Vehicle Type
 
@@ -252,7 +252,7 @@ Maximum Capacity
 
 Odometer
 
-Purchase Cost
+Acquisition Cost
 
 Status
 
@@ -301,6 +301,8 @@ License Category
 Expiry Date
 
 Phone
+
+Trip Compl. %
 
 Safety Score
 
@@ -420,13 +422,13 @@ Fields
 
 Vehicle
 
-Type
+Service Type
+
+Cost
 
 Date
 
-Notes
-
-Status
+Status (Active/Completed)
 
 
 
@@ -468,29 +470,31 @@ Fields
 
 Vehicle
 
-Trip
+Date
 
 Liters
 
-Cost
-
-Date
+Fuel Cost
 
 Expense Management
 
 
 
-Categories
+Other Expenses Fields:
 
 
 
-Fuel
+Trip
 
-Maintenance
+Vehicle
 
 Toll
 
 Other
+
+Maint. (Linked)
+
+Total
 
 Reports
 
@@ -783,6 +787,20 @@ reports/
 
 
 settings/
+
+
+
+General Settings:
+
+
+
+Depot Name
+
+Currency
+
+Distance Unit
+
+
 
 Backend Structure
 
