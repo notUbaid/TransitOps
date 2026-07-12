@@ -22,7 +22,7 @@ The platform manages vehicles, drivers, trips, maintenance, and expenses, enforc
 - **State/Data Fetching:** React Server Components (RSC) + Server Actions
 - **Forms:** React Hook Form + Zod (for validation)
 - **Tables/Charts:** TanStack Table v8, Recharts
-- **Database:** PostgreSQL via Prisma ORM
+- **Database:** SQLite via Prisma ORM
 - **Auth:** Better Auth (Role-Based Access Control)
 
 ---
@@ -167,7 +167,7 @@ src/
 ### Phase 1: Foundation & Setup
 - [ ] Initialize Next.js 15 project with Tailwind CSS.
 - [ ] Install shadcn/ui and configure core components (Button, Input, Table, Card, Dialog).
-- [ ] Setup PostgreSQL database & Prisma schema based on Section 3.
+- [ ] Setup SQLite database & Prisma schema based on Section 3.
 - [ ] Implement Better Auth with RBAC (Roles setup).
 - [ ] Build global `(dashboard)/layout.tsx` (Sidebar with role-based visibility).
 

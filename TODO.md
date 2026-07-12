@@ -9,10 +9,10 @@ Here is the massive TO-DO list of what is left to integrate and build.
 ---
 
 ## 🏗️ 1. Architecture Alignment & Resolution
-**The team must decide on the final tech stack.** 
-- [ ] **Option A (Adopt Flask):** Update `ProjectDetails.md` to reflect the Python/Flask stack, removing references to Next.js, Prisma, and React Server Components.
-- [ ] **Option B (Migrate to Next.js):** Use the Flask application purely as a backend API. Strip out the Jinja templates and rewrite the frontend in Next.js 15 / React.
-- [ ] **Database Migration:** Upgrade the current SQLite database (`schema.sql`) to a production-ready PostgreSQL instance (as specified in the original docs).
+**DECISION MADE:** Migrate to Next.js, keep SQLite.
+- [x] Update `ProjectDetails.md` to reflect SQLite decision.
+- [ ] **Migrate to Next.js:** Rebuild the frontend in Next.js 15 / React (App Router), replacing the Flask Jinja templates.
+- [ ] **API/Backend Strategy:** Port the Flask routes into Next.js Server Actions, operating on the existing SQLite database via Prisma ORM.
 
 ---
 
