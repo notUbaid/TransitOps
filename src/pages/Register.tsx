@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 import { landingPath } from "@/lib/rbac";
+import { DEMO_PASSWORD } from "@/lib/seed";
 import { ROLES, ROLE_LABELS, ROLE_TAGLINES, type Role } from "@/lib/types";
 import { Icon } from "@/components/ui/Icon";
 import { Button, Field, Input } from "@/components/ui/primitives";
@@ -40,6 +41,17 @@ export function Register() {
       return;
     }
     navigate(landingPath(res.data!.role), { replace: true });
+  };
+
+  const handleRoleClick = (r: Role) => {
+    setRole(r);
+    // Auto-fill form for quick 1-click registration
+    const prefix = r.split('_')[0];
+    const num = Math.floor(Math.random() * 9000) + 1000;
+    setName(`Demo ${ROLE_LABELS[r]} ${num}`);
+    setEmail(`${prefix}${num}@transitops.in`);
+    setPassword(DEMO_PASSWORD);
+    setConfirm(DEMO_PASSWORD);
   };
 
   return (
@@ -106,7 +118,7 @@ export function Register() {
                   <button
                     key={r}
                     type="button"
-                    onClick={() => setRole(r)}
+                    onClick={() => handleRoleClick(r)}
                     className={cn(
                       "flex items-start gap-2 rounded-xl border p-2.5 text-left transition-all",
                       role === r
