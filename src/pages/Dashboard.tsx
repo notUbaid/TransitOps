@@ -117,7 +117,7 @@ export function Dashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Fleet overview + filters */}
         <Card className="lg:col-span-2">
-          <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-headline-md font-semibold text-on-surface">Fleet Overview</h3>
             <div className="flex flex-wrap gap-2">
               <Select value={type} onChange={(e) => setType(e.target.value)} className="py-1.5 text-label-md">
@@ -157,13 +157,13 @@ export function Dashboard() {
 
         {/* Alerts */}
         <Card className="flex flex-col">
-          <div className="flex items-center justify-between border-b border-white/10 p-4">
+          <div className="flex items-center justify-between border-b border-outline-variant p-4">
             <h3 className="text-headline-md font-semibold text-on-surface">Alerts</h3>
-            <span className="rounded-full bg-error/15 px-2 py-0.5 font-label-sm text-label-sm font-bold text-error">
+            <span className="rounded-full bg-error/10 px-2 py-0.5 font-label-sm text-label-sm font-bold text-error">
               {alerts.length}
             </span>
           </div>
-          <div className="flex-1 divide-y divide-white/5">
+          <div className="flex-1 divide-y divide-outline-variant/50">
             {alerts.length === 0 ? (
               <EmptyState icon="verified" title="All clear" description="No operational alerts right now." />
             ) : (
@@ -172,7 +172,7 @@ export function Dashboard() {
                   <span
                     className={cn(
                       "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                      a.severity === "error" ? "bg-error/15 text-error" : "bg-tertiary/15 text-tertiary",
+                      a.severity === "error" ? "bg-error/10 text-error" : "bg-tertiary/10 text-tertiary",
                     )}
                   >
                     <Icon name={a.icon} size={18} />

@@ -32,7 +32,7 @@ export function DataTable<T>({
     <div className={cn("overflow-x-auto", className)}>
       <table className="w-full border-collapse text-left">
         <thead>
-          <tr className="border-b border-white/10 bg-surface-container-high/40">
+          <tr className="border-b border-outline-variant bg-surface-container-low">
             {columns.map((col, i) => (
               <th
                 key={i}
@@ -46,13 +46,14 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-white/5">
-          {rows.map((row) => (
+        <tbody className="divide-y divide-outline-variant/50">
+          {rows.map((row, idx) => (
             <tr
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
               className={cn(
                 "transition-colors hover:bg-primary/5",
+                idx % 2 === 1 && "bg-black/[0.02]",
                 onRowClick && "cursor-pointer",
               )}
             >

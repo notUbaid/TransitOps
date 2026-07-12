@@ -34,30 +34,31 @@ import { Button, Card, EmptyState, PageHeader } from "@/components/ui/primitives
 import { useToast } from "@/components/ui/Toast";
 
 const C = {
-  primary: "#adc6ff",
-  primaryDim: "#4d8eff",
-  tertiary: "#ffb786",
-  tertiaryC: "#df7412",
-  secondary: "#b7c8e1",
-  emerald: "#6ee7b7",
-  outline: "#8c909f",
-  axis: "#8c909f",
-  grid: "rgba(255,255,255,0.06)",
+  primary: "#2563eb",
+  primaryDim: "#1d4ed8",
+  tertiary: "#f97316",
+  tertiaryC: "#ea580c",
+  secondary: "#8b9dc3",
+  emerald: "#16a34a",
+  outline: "#9ca3af",
+  axis: "#9ca3af",
+  grid: "rgba(0,0,0,0.06)",
 };
 
 const PIE_COLORS: Record<string, string> = {
-  Fuel: C.primary,
-  Tolls: C.secondary,
-  Maintenance: C.tertiaryC,
-  Other: C.outline,
+  Fuel: "#2563eb",
+  Tolls: "#8b9dc3",
+  Maintenance: "#ea580c",
+  Other: "#9ca3af",
 };
 
 const tooltipStyle = {
-  background: "#1d2027",
-  border: "1px solid rgba(255,255,255,0.1)",
+  background: "#ffffff",
+  border: "1px solid #e5e7eb",
   borderRadius: 8,
-  color: "#e1e2ec",
+  color: "#111827",
   fontSize: 12,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
 };
 
 export function Analytics() {
@@ -149,7 +150,7 @@ export function Analytics() {
               />
               <Tooltip
                 contentStyle={tooltipStyle}
-                cursor={{ fill: "rgba(255,255,255,0.03)" }}
+                cursor={{ fill: "rgba(0,0,0,0.03)" }}
                 formatter={(v: any, name: any) => [formatCurrency(v as number, currency), name === "revenue" ? "Revenue" : "Cost"]}
               />
               <Bar dataKey="revenue" fill={C.primary} radius={[4, 4, 0, 0]} maxBarSize={38} isAnimationActive={false} />
@@ -212,7 +213,7 @@ export function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false} />
                 <XAxis type="number" stroke={C.axis} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => formatCompactCurrency(v, currency)} />
                 <YAxis type="category" dataKey="name" stroke={C.axis} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={80} />
-                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.03)" }} formatter={(v: any) => [formatCurrency(v as number, currency), "Cost"]} />
+                <Tooltip contentStyle={tooltipStyle}                 cursor={{ fill: "rgba(0,0,0,0.03)" }} formatter={(v: any) => [formatCurrency(v as number, currency), "Cost"]} />
                 <Bar dataKey="cost" fill={C.tertiaryC} radius={[0, 4, 4, 0]} maxBarSize={26} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>
@@ -220,25 +221,25 @@ export function Analytics() {
         </Card>
 
         <Card>
-          <div className="border-b border-white/10 p-4 lg:p-6 lg:pb-4">
+          <div className="border-b border-outline-variant p-4 lg:p-6 lg:pb-4">
             <h3 className="text-headline-md font-semibold text-on-surface">Vehicle ROI</h3>
             <p className="font-label-sm text-label-sm text-on-surface-variant">(Revenue − Cost) / Acquisition</p>
           </div>
           <div className="max-h-[280px] overflow-y-auto">
             <table className="w-full text-left text-body-md">
-              <thead className="sticky top-0 bg-surface-container">
-                <tr className="border-b border-white/10 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+              <thead className="sticky top-0 bg-white">
+                <tr className="border-b border-outline-variant font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
                   <th className="px-4 py-2.5 font-medium">Vehicle</th>
                   <th className="px-4 py-2.5 text-right font-medium">Revenue</th>
                   <th className="px-4 py-2.5 text-right font-medium">ROI</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-outline-variant/50">
                 {roiRows.map((r) => (
                   <tr key={r.reg} className="hover:bg-primary/5">
                     <td className="px-4 py-2.5 font-mono text-on-surface">{r.reg.replace("GJ-01-", "")}</td>
                     <td className="px-4 py-2.5 text-right font-mono text-on-surface-variant">{formatCompactCurrency(r.revenue, currency)}</td>
-                    <td className={`px-4 py-2.5 text-right font-mono font-semibold ${r.roi >= 0 ? "text-emerald-300" : "text-error"}`}>
+                      <td className={`px-4 py-2.5 text-right font-mono font-semibold ${r.roi >= 0 ? "text-emerald-600" : "text-error"}`}>
                       {r.roi.toFixed(1)}%
                     </td>
                   </tr>

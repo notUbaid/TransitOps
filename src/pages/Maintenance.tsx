@@ -141,11 +141,11 @@ export function Maintenance() {
             cell: (m: MaintenanceLog) => (
               <div className="flex items-center justify-end gap-1">
                 {m.status === "ACTIVE" && (
-                  <button onClick={() => setCompleteId(m.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-emerald-300" title="Mark completed">
+                  <button onClick={() => setCompleteId(m.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-emerald-600" title="Mark completed">
                     <Icon name="task_alt" size={18} />
                   </button>
                 )}
-                <button onClick={() => setDeleteId(m.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Delete">
+                <button onClick={() => setDeleteId(m.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error" title="Delete">
                   <Icon name="delete" size={18} />
                 </button>
               </div>
@@ -185,7 +185,7 @@ export function Maintenance() {
       </div>
 
       <Card>
-        <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-headline-md font-semibold text-on-surface">Service Logs</h3>
           <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="py-1.5 sm:w-auto">
             <option value="all">All Status</option>

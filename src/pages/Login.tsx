@@ -58,21 +58,21 @@ export function Login() {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
       {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0 opacity-40">
-        <div className="absolute left-[-5%] top-[10%] h-[45%] w-[45%] rounded-full bg-primary-container/40 blur-[130px]" />
-        <div className="absolute right-[-5%] bottom-[5%] h-[40%] w-[40%] rounded-full bg-tertiary-container/30 blur-[130px]" />
+      <div className="pointer-events-none absolute inset-0 opacity-[0.08]">
+        <div className="absolute left-[-5%] top-[10%] h-[45%] w-[45%] rounded-full bg-primary blur-[130px]" />
+        <div className="absolute right-[-5%] bottom-[5%] h-[40%] w-[40%] rounded-full bg-tertiary blur-[130px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-center">
-          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
             <Icon name="hub" className="text-primary" size={30} fill />
           </div>
           <h1 className="text-headline-lg font-extrabold tracking-tight text-on-surface">TransitOps</h1>
           <p className="mt-1 text-body-md text-on-surface-variant">Smart Transport Operations Platform</p>
         </div>
 
-        <div className="glass-strong rounded-2xl p-6 sm:p-8">
+        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
           <h2 className="text-headline-md font-semibold text-on-surface">Sign in</h2>
           <p className="mt-1 text-body-md text-on-surface-variant">Access your fleet operations console.</p>
 
@@ -125,11 +125,11 @@ export function Login() {
           </form>
 
           <div className="my-6 flex items-center gap-3">
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-outline-variant" />
             <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
               Demo accounts
             </span>
-            <div className="h-px flex-1 bg-white/10" />
+            <div className="h-px flex-1 bg-outline-variant" />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -138,7 +138,7 @@ export function Login() {
                 key={role}
                 onClick={() => loginAs(role)}
                 className={cn(
-                  "group flex flex-col items-start gap-1 rounded-xl border border-white/10 bg-surface-container-low/60 p-3 text-left transition-all hover:border-primary/40 hover:bg-primary/5",
+                  "group flex flex-col items-start gap-1 rounded-xl border border-outline-variant bg-surface-container-low p-3 text-left transition-all hover:border-primary/40 hover:bg-primary/5",
                 )}
               >
                 <Icon name={ROLE_ICON[role]} size={20} className="text-primary" />

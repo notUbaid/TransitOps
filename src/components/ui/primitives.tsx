@@ -21,14 +21,14 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-on-primary hover:bg-primary/90",
+    "bg-primary text-on-primary hover:bg-primary/90 shadow-sm",
   secondary:
-    "bg-surface-container-high text-on-surface border border-white/10 hover:bg-surface-variant",
+    "bg-white text-on-surface border border-outline hover:bg-surface-container-high",
   outline:
-    "border border-white/10 text-on-surface hover:bg-surface-container-high",
-  ghost: "text-on-surface-variant hover:text-on-surface hover:bg-white/5",
+    "border border-outline text-on-surface hover:bg-surface-container-high",
+  ghost: "text-on-surface-variant hover:text-on-surface hover:bg-black/5",
   danger:
-    "bg-error/15 text-error border border-error/40 hover:bg-error/25",
+    "bg-error/10 text-error border border-error/30 hover:bg-error/20",
 };
 
 export function Button({
@@ -43,7 +43,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-label-md text-label-md font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-xl font-label-md text-label-md font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50",
         size === "sm" ? "px-3 py-1.5" : "px-4 py-2.5",
         BUTTON_VARIANTS[variant],
         className,
@@ -67,8 +67,8 @@ export function Card({
   return (
     <div
       className={cn(
-        "glass rounded-xl",
-        interactive && "transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20",
+        "bg-white rounded-2xl border border-outline-variant",
+        interactive && "transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
         className,
       )}
       {...props}
@@ -192,10 +192,10 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="glass flex flex-col gap-4 rounded-xl p-5 md:flex-row md:items-center md:justify-between md:p-6">
+    <div className="flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:flex-row md:items-center md:justify-between md:p-6">
       <div className="flex items-start gap-3">
         {icon && (
-          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+          <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Icon name={icon} size={22} />
           </div>
         )}
@@ -230,7 +230,7 @@ export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="glass flex flex-col gap-4 rounded-xl p-5 md:flex-row md:items-center md:justify-between md:p-6">
+      <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 md:flex-row md:items-center md:justify-between md:p-6">
         <div className="flex items-start gap-3">
           <Skeleton className="mt-0.5 h-10 w-10 shrink-0 rounded-lg" />
           <div className="space-y-2">
@@ -244,7 +244,7 @@ export function DashboardSkeleton() {
       {/* 4 Cards */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="glass rounded-xl p-4">
+          <div key={i} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
             <div className="mb-4 flex items-center justify-between">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-6 w-6 rounded-full" />
@@ -256,8 +256,8 @@ export function DashboardSkeleton() {
 
       {/* 2 Big Blocks */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Skeleton className="glass h-64 w-full rounded-xl" />
-        <Skeleton className="glass h-64 w-full rounded-xl" />
+        <Skeleton className="h-64 w-full rounded-2xl bg-white ring-1 ring-black/5" />
+        <Skeleton className="h-64 w-full rounded-2xl bg-white ring-1 ring-black/5" />
       </div>
     </div>
   );

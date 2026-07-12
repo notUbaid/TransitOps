@@ -171,14 +171,14 @@ export function Fleet() {
               <div className="flex items-center justify-end gap-1">
                 <button
                   onClick={() => openEdit(v)}
-                  className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary"
+                  className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-primary"
                   aria-label="Edit"
                 >
                   <Icon name="edit" size={18} />
                 </button>
                 <button
                   onClick={() => setDeleteId(v.id)}
-                  className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error"
+                  className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error"
                   aria-label="Delete"
                 >
                   <Icon name="delete" size={18} />
@@ -213,7 +213,7 @@ export function Fleet() {
       {!editable && <ReadOnlyNotice />}
 
       <Card>
-        <div className="flex flex-col gap-3 border-b border-white/10 p-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-xs">
             <Icon name="search" size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <Input
@@ -260,7 +260,7 @@ export function Fleet() {
             />
           }
         />
-        <div className="border-t border-white/10 px-4 py-2.5 font-label-sm text-label-sm text-on-surface-variant">
+        <div className="border-t border-outline-variant px-4 py-2.5 font-label-sm text-label-sm text-on-surface-variant">
           {rows.length} of {db.vehicles.length} vehicles
         </div>
       </Card>
