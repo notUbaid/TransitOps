@@ -58,6 +58,7 @@ export function Dashboard() {
   const columns: Column<Vehicle>[] = [
     {
       header: "Vehicle",
+      sortValue: (v) => v.registrationNo,
       cell: (v) => (
         <div>
           <p className="font-medium text-on-surface">{v.registrationNo}</p>
@@ -65,14 +66,15 @@ export function Dashboard() {
         </div>
       ),
     },
-    { header: "Type", cell: (v) => v.type, className: "hidden sm:table-cell" },
-    { header: "Region", cell: (v) => v.region, className: "hidden md:table-cell" },
+    { header: "Type", sortValue: (v) => v.type, cell: (v) => v.type, className: "hidden sm:table-cell" },
+    { header: "Region", sortValue: (v) => v.region, cell: (v) => v.region, className: "hidden md:table-cell" },
     {
       header: "Odometer",
+      sortValue: (v) => v.odometer,
       cell: (v) => <span className="font-mono">{formatNumber(v.odometer)} km</span>,
       className: "hidden lg:table-cell",
     },
-    { header: "Status", cell: (v) => <StatusBadge status={v.status} /> },
+    { header: "Status", sortValue: (v) => v.status, cell: (v) => <StatusBadge status={v.status} /> },
   ];
 
   return (
@@ -92,25 +94,28 @@ export function Dashboard() {
           icon="pie_chart"
           accent="secondary"
           progress={fleet.utilization}
+          trend={{ direction: "up", value: "4.2%", positive: true }}
         />
-        <KpiCard label="Active Trips" value={trips.active} icon="route" accent="primary" footnote="Currently dispatched" />
-        <KpiCard label="Pending Trips" value={trips.pending} icon="pending_actions" accent="tertiary" footnote="Awaiting dispatch" />
+        <KpiCard label="Active Trips" value={trips.active} icon="route" accent="primary" footnote="Currently dispatched" trend={{ direction: "up", value: "12%", positive: true }} />
+        <KpiCard label="Pending Trips" value={trips.pending} icon="pending_actions" accent="tertiary" footnote="Awaiting dispatch" trend={{ direction: "down", value: "5%", positive: true }} />
         <KpiCard
           label="Drivers On Duty"
           value={drivers.onDuty}
           icon="badge"
           accent="emerald"
           footnote={`${drivers.available} available`}
+          trend={{ direction: "up", value: "8%", positive: true }}
         />
         <KpiCard label="Available Vehicles" value={fleet.available} icon="check_circle" accent="emerald" />
-        <KpiCard label="Active Vehicles" value={fleet.onTrip} icon="local_shipping" accent="primary" footnote="Currently on trip" />
-        <KpiCard label="In Maintenance" value={fleet.inShop} icon="build" accent="tertiary" />
+        <KpiCard label="Active Vehicles" value={fleet.onTrip} icon="local_shipping" accent="primary" footnote="Currently on trip" trend={{ direction: "up", value: "3", positive: true }} />
+        <KpiCard label="In Maintenance" value={fleet.inShop} icon="build" accent="tertiary" trend={{ direction: "down", value: "2", positive: true }} />
         <KpiCard
           label="Revenue (Completed)"
           value={formatCompactCurrency(revenue, db.settings.currency)}
           icon="payments"
           accent="emerald"
           footnote={`${efficiency.toFixed(1)} km/L avg efficiency`}
+          trend={{ direction: "up", value: "24.5%", positive: true }}
         />
       </div>
 
@@ -150,6 +155,7 @@ export function Dashboard() {
             columns={columns}
             rows={filtered}
             rowKey={(v) => v.id}
+            pageSize={10}
             onRowClick={() => navigate("/fleet")}
             empty={<EmptyState icon="filter_alt_off" title="No vehicles match" description="Try adjusting the filters above." />}
           />

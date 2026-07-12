@@ -123,21 +123,24 @@ export function Expenses() {
   };
 
   const columns: Column<Expense>[] = [
-    { header: "Type", cell: (e) => <StatusBadge status={e.type} dot={false} /> },
-    { header: "Description", cell: (e) => e.description },
+    { header: "Type", sortValue: (e) => e.type, cell: (e) => <StatusBadge status={e.type} dot={false} /> },
+    { header: "Description", sortValue: (e) => e.description, cell: (e) => e.description },
     {
       header: "Vehicle",
+      sortValue: (e) => vehicleById(e.vehicleId)?.registrationNo,
       cell: (e) => <span className="font-mono text-on-surface-variant">{vehicleById(e.vehicleId)?.registrationNo ?? "—"}</span>,
       className: "hidden md:table-cell",
     },
     {
       header: "Liters",
+      sortValue: (e) => e.liters,
       cell: (e) => (e.liters ? <span className="font-mono">{e.liters} L</span> : "—"),
       className: "hidden lg:table-cell",
     },
-    { header: "Date", cell: (e) => formatDate(e.date), className: "hidden sm:table-cell" },
+    { header: "Date", sortValue: (e) => e.date, cell: (e) => formatDate(e.date), className: "hidden sm:table-cell" },
     {
       header: "Amount",
+      sortValue: (e) => e.amount,
       className: "text-right",
       cell: (e) => <span className="font-mono font-semibold text-on-surface">{formatCurrency(e.amount, db.settings.currency)}</span>,
     },
@@ -209,6 +212,7 @@ export function Expenses() {
             columns={columns}
             rows={rows}
             rowKey={(e) => e.id}
+            pageSize={10}
             empty={<EmptyState icon="receipt_long" title="No expenses" description="Log fuel, tolls, or other costs." action={editable ? <Button icon="add" onClick={openAdd}>Add Expense</Button> : undefined} />}
           />
         </Card>

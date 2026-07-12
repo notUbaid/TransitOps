@@ -39,7 +39,7 @@ const emptyForm: TripForm = {
 
 export function Trips() {
   const store = useStore();
-  const { db, createTrip, dispatchTrip, completeTrip, cancelTrip, deleteTrip, vehicleById, driverById } = store;
+  const { db, createTrip, updateTrip, dispatchTrip, completeTrip, cancelTrip, deleteTrip, vehicleById, driverById } = store;
   const { canEdit } = useAuth();
   const toast = useToast();
   const editable = canEdit("trips");
@@ -49,6 +49,7 @@ export function Trips() {
   const [statusFilter, setStatusFilter] = useState<TripStatus | "all">("all");
 
   const [form, setForm] = useState<TripForm>(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [completing, setCompleting] = useState<Trip | null>(null);
   const [endOdometer, setEndOdometer] = useState(0);
   const [fuelLiters, setFuelLiters] = useState(0);
@@ -87,22 +88,63 @@ export function Trips() {
   }, [db.trips, search, statusFilter]);
 
   const submitTrip = (intent: "draft" | "dispatch") => {
-    const res = createTrip({
-      source: form.source,
-      destination: form.destination,
-      vehicleId: form.vehicleId || null,
-      driverId: form.driverId || null,
-      cargoKg: form.cargoKg,
-      plannedKm: form.plannedKm,
-      revenue: form.revenue,
-      intent,
-    });
-    if (res.ok) {
-      toast.success(intent === "dispatch" ? `Trip ${res.data!.code} dispatched.` : `Draft ${res.data!.code} saved.`);
-      setForm(emptyForm);
+    if (editingId) {
+      const res = updateTrip(editingId, {
+        source: form.source,
+        destination: form.destination,
+        vehicleId: form.vehicleId || null,
+        driverId: form.driverId || null,
+        cargoKg: form.cargoKg,
+        plannedKm: form.plannedKm,
+        revenue: form.revenue,
+      });
+      if (res.ok) {
+        toast.success(`Draft ${res.data!.code} updated.`);
+        setForm(emptyForm);
+        setEditingId(null);
+        if (intent === "dispatch") {
+          onDispatchExisting(editingId);
+        }
+      } else {
+        toast.error(res.error);
+      }
     } else {
-      toast.error(res.error);
+      const res = createTrip({
+        source: form.source,
+        destination: form.destination,
+        vehicleId: form.vehicleId || null,
+        driverId: form.driverId || null,
+        cargoKg: form.cargoKg,
+        plannedKm: form.plannedKm,
+        revenue: form.revenue,
+        intent,
+      });
+      if (res.ok) {
+        toast.success(intent === "dispatch" ? `Trip ${res.data!.code} dispatched.` : `Draft ${res.data!.code} saved.`);
+        setForm(emptyForm);
+      } else {
+        toast.error(res.error);
+      }
     }
+  };
+
+  const onEditDraft = (trip: Trip) => {
+    setEditingId(trip.id);
+    setForm({
+      source: trip.source,
+      destination: trip.destination,
+      vehicleId: trip.vehicleId || "",
+      driverId: trip.driverId || "",
+      cargoKg: trip.cargoKg,
+      plannedKm: trip.plannedKm,
+      revenue: trip.revenue,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const onCancelEdit = () => {
+    setEditingId(null);
+    setForm(emptyForm);
   };
 
   const onDispatchExisting = (id: string) => {
@@ -157,9 +199,10 @@ export function Trips() {
   };
 
   const columns: Column<Trip>[] = [
-    { header: "Code", cell: (t) => <span className="font-mono font-semibold text-primary">{t.code}</span> },
+    { header: "Code", sortValue: (t) => t.code, cell: (t) => <span className="font-mono font-semibold text-primary">{t.code}</span> },
     {
       header: "Route",
+      sortValue: (t) => `${t.source}-${t.destination}`,
       cell: (t) => (
         <span className="text-on-surface">
           {t.source} <span className="text-on-surface-variant">→</span> {t.destination}
@@ -168,6 +211,7 @@ export function Trips() {
     },
     {
       header: "Vehicle / Driver",
+      sortValue: (t) => vehicleById(t.vehicleId)?.registrationNo,
       className: "hidden md:table-cell",
       cell: (t) => (
         <div className="font-label-sm text-label-sm text-on-surface-variant">
@@ -176,9 +220,9 @@ export function Trips() {
         </div>
       ),
     },
-    { header: "Cargo", cell: (t) => <span className="font-mono">{formatNumber(t.cargoKg)} kg</span>, className: "hidden lg:table-cell" },
-    { header: "Revenue", cell: (t) => formatCurrency(t.revenue, db.settings.currency), className: "hidden xl:table-cell" },
-    { header: "Status", cell: (t) => <StatusBadge status={t.status} /> },
+    { header: "Cargo", sortValue: (t) => t.cargoKg, cell: (t) => <span className="font-mono">{formatNumber(t.cargoKg)} kg</span>, className: "hidden lg:table-cell" },
+    { header: "Revenue", sortValue: (t) => t.revenue, cell: (t) => formatCurrency(t.revenue, db.settings.currency), className: "hidden xl:table-cell" },
+    { header: "Status", sortValue: (t) => t.status, cell: (t) => <StatusBadge status={t.status} /> },
     ...(editable
       ? [
           {
@@ -188,9 +232,14 @@ export function Trips() {
             cell: (t: Trip) => (
               <div className="flex items-center justify-end gap-1">
                 {t.status === "DRAFT" && (
-                  <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Dispatch" aria-label="Dispatch trip">
-                    <Icon name="send" size={18} />
-                  </button>
+                  <>
+                    <button onClick={() => onEditDraft(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Edit" aria-label="Edit draft">
+                      <Icon name="edit" size={18} />
+                    </button>
+                    <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Dispatch" aria-label="Dispatch trip">
+                      <Icon name="send" size={18} />
+                    </button>
+                  </>
                 )}
                 {t.status === "DISPATCHED" && (
                   <button onClick={() => openComplete(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-emerald-300" title="Complete" aria-label="Complete trip">
@@ -280,7 +329,7 @@ export function Trips() {
                     min={0}
                     value={form.cargoKg}
                     onChange={(e) => setForm({ ...form, cargoKg: Number(e.target.value) })}
-                    className={capacityExceeded ? "border-error focus:!shadow-[0_0_0_1px_var(--color-error)]" : ""}
+                    className={capacityExceeded ? "border-error focus:shadow-[0_0_0_1px_var(--color-error)]!" : ""}
                     required
                   />
                 </Field>
@@ -317,8 +366,13 @@ export function Trips() {
               )}
 
               <div className="flex flex-col-reverse gap-2 border-t border-white/10 pt-4 sm:flex-row sm:justify-end">
+                {editingId && (
+                  <Button type="button" variant="outline" onClick={onCancelEdit}>
+                    Cancel Edit
+                  </Button>
+                )}
                 <Button type="button" variant="outline" onClick={() => submitTrip("draft")}>
-                  Save as Draft
+                  {editingId ? "Update Draft" : "Save as Draft"}
                 </Button>
                 <Button type="submit" icon="send" disabled={!canDispatch}>
                   Dispatch Trip
@@ -351,7 +405,7 @@ export function Trips() {
                     <div className={cn("absolute left-0 top-0 h-full w-1", style.dot)} />
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <div>
-                        <span className="rounded bg-primary/10 px-2 py-0.5 font-mono font-label-sm text-label-sm text-primary">
+                        <span className="rounded bg-primary/10 px-2 py-0.5 font-label-sm text-label-sm text-primary">
                           {t.code}
                         </span>
                         <h4 className="mt-2 font-medium text-on-surface">
@@ -421,6 +475,7 @@ export function Trips() {
           columns={columns}
           rows={tableRows}
           rowKey={(t) => t.id}
+          pageSize={10}
           empty={<EmptyState icon="route" title="No trips found" description="Create a trip to get started." />}
         />
       </Card>

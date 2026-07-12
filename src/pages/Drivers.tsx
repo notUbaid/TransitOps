@@ -65,6 +65,7 @@ export function Drivers() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Driver | null>(null);
+  const [detailDriver, setDetailDriver] = useState<Driver | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -136,6 +137,7 @@ export function Drivers() {
   const columns: Column<Driver>[] = [
     {
       header: "Driver",
+      sortValue: (d) => d.name,
       cell: (d) => (
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary-container font-label-sm text-label-sm font-bold text-on-secondary-container">
@@ -148,9 +150,10 @@ export function Drivers() {
         </div>
       ),
     },
-    { header: "Category", cell: (d) => d.category, className: "hidden sm:table-cell" },
+    { header: "Category", sortValue: (d) => d.category, cell: (d) => d.category, className: "hidden sm:table-cell" },
     {
       header: "License Expiry",
+      sortValue: (d) => d.licenseExpiry,
       className: "hidden md:table-cell",
       cell: (d) => {
         const expired = isExpired(d.licenseExpiry);
@@ -174,11 +177,12 @@ export function Drivers() {
     },
     {
       header: "Safety",
+      sortValue: (d) => d.safetyScore,
       className: "hidden lg:table-cell",
       cell: (d) => <span className={cn("font-mono font-semibold", scoreColor(d.safetyScore))}>{d.safetyScore}</span>,
     },
-    { header: "Contact", cell: (d) => <span className="font-mono">{d.phone}</span>, className: "hidden xl:table-cell" },
-    { header: "Status", cell: (d) => <StatusBadge status={d.status} /> },
+    { header: "Contact", sortValue: (d) => d.phone, cell: (d) => <span className="font-mono">{d.phone}</span>, className: "hidden xl:table-cell" },
+    { header: "Status", sortValue: (d) => d.status, cell: (d) => <StatusBadge status={d.status} /> },
     ...(editable
       ? [
           {
@@ -187,10 +191,10 @@ export function Drivers() {
             className: "text-right",
             cell: (d: Driver) => (
               <div className="flex items-center justify-end gap-1">
-                <button onClick={() => openEdit(d)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" aria-label="Edit">
+                <button onClick={(e) => { e.stopPropagation(); openEdit(d); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" aria-label="Edit">
                   <Icon name="edit" size={18} />
                 </button>
-                <button onClick={() => setDeleteId(d.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" aria-label="Delete">
+                <button onClick={(e) => { e.stopPropagation(); setDeleteId(d.id); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" aria-label="Delete">
                   <Icon name="delete" size={18} />
                 </button>
               </div>
@@ -242,6 +246,8 @@ export function Drivers() {
           columns={columns}
           rows={rows}
           rowKey={(d) => d.id}
+          onRowClick={(d) => setDetailDriver(d)}
+          pageSize={10}
           empty={
             <EmptyState
               icon="badge"
@@ -321,6 +327,61 @@ export function Drivers() {
         danger
         icon="delete"
       />
+
+      {/* Detail Modal */}
+      {detailDriver && (
+        <Modal
+          open={!!detailDriver}
+          onClose={() => setDetailDriver(null)}
+          title={`Driver: ${detailDriver.name}`}
+          description={detailDriver.licenseNumber}
+          icon="badge"
+          footer={
+            <Button variant="outline" onClick={() => setDetailDriver(null)}>
+              Close
+            </Button>
+          }
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 rounded-xl border border-white/10 bg-surface-container-high/40 p-4 sm:grid-cols-4">
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Category</p>
+                <p className="font-medium text-on-surface">{detailDriver.category}</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+                <p className="font-medium text-on-surface">{detailDriver.status}</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Safety Score</p>
+                <p className={cn("font-mono font-semibold", scoreColor(detailDriver.safetyScore))}>{detailDriver.safetyScore}/100</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Trip Completion</p>
+                <p className="font-mono text-on-surface">{detailDriver.tripCompletionRate}%</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-label-md text-label-md font-bold text-on-surface">Recent Trips</h4>
+              <ul className="mt-2 divide-y divide-white/5 rounded-lg border border-white/10">
+                {db.trips
+                  .filter((t) => t.driverId === detailDriver.id)
+                  .slice(0, 5)
+                  .map((t) => (
+                    <li key={t.id} className="flex justify-between p-3 text-body-md">
+                      <span className="text-on-surface">{t.source} → {t.destination}</span>
+                      <span className="font-mono text-on-surface-variant">{t.status}</span>
+                    </li>
+                  ))}
+                {db.trips.filter((t) => t.driverId === detailDriver.id).length === 0 && (
+                  <li className="p-3 text-body-sm text-on-surface-variant">No trips recorded.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

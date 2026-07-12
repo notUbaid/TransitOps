@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   Bar,
   BarChart,
@@ -99,17 +101,42 @@ export function Analytics() {
     toast.info("Exported analytics_vehicle_roi.csv");
   };
 
+  const exportPdf = async () => {
+    const el = document.getElementById("analytics-page");
+    if (!el) return;
+    try {
+      toast.info("Generating PDF, please wait...");
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save("transitops_analytics.pdf");
+      toast.success("PDF exported successfully");
+    } catch (e) {
+      toast.error("Failed to export PDF");
+      console.error(e);
+    }
+  };
+
   const currency = db.settings.currency;
 
   return (
-    <>
+    <div id="analytics-page" className="space-y-6">
       <PageHeader
         title="Reports & Analytics"
         subtitle="Performance metrics and operational efficiency data."
         icon="analytics"
         actions={
           <>
-            <Button variant="outline" icon="picture_as_pdf" onClick={() => window.print()}>
+            <Button variant="outline" icon="picture_as_pdf" onClick={exportPdf}>
               PDF
             </Button>
             <Button variant="outline" icon="download" onClick={exportCsv}>
@@ -248,6 +275,6 @@ export function Analytics() {
           </div>
         </Card>
       </div>
-    </>
+    </div>
   );
 }

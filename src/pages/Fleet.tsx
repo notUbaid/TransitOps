@@ -53,6 +53,7 @@ export function Fleet() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Vehicle | null>(null);
+  const [detailVehicle, setDetailVehicle] = useState<Vehicle | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -130,6 +131,7 @@ export function Fleet() {
   const columns: Column<Vehicle>[] = [
     {
       header: "Vehicle",
+      sortValue: (v) => v.registrationNo,
       cell: (v) => (
         <div className="flex items-center gap-2">
           <div>
@@ -144,23 +146,26 @@ export function Fleet() {
         </div>
       ),
     },
-    { header: "Type", cell: (v) => v.type, className: "hidden sm:table-cell" },
+    { header: "Type", sortValue: (v) => v.type, cell: (v) => v.type, className: "hidden sm:table-cell" },
     {
       header: "Capacity",
+      sortValue: (v) => v.capacityKg,
       cell: (v) => <span className="font-mono">{formatNumber(v.capacityKg)} kg</span>,
       className: "hidden md:table-cell",
     },
     {
       header: "Odometer",
+      sortValue: (v) => v.odometer,
       cell: (v) => <span className="font-mono">{formatNumber(v.odometer)} km</span>,
       className: "hidden lg:table-cell",
     },
     {
       header: "Acq. Cost",
+      sortValue: (v) => v.acquisitionCost,
       cell: (v) => formatCurrency(v.acquisitionCost, db.settings.currency),
       className: "hidden xl:table-cell",
     },
-    { header: "Status", cell: (v) => <StatusBadge status={v.status} /> },
+    { header: "Status", sortValue: (v) => v.status, cell: (v) => <StatusBadge status={v.status} /> },
     ...(editable
       ? [
           {
@@ -170,14 +175,20 @@ export function Fleet() {
             cell: (v: Vehicle) => (
               <div className="flex items-center justify-end gap-1">
                 <button
-                  onClick={() => openEdit(v)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEdit(v);
+                  }}
                   className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary"
                   aria-label="Edit"
                 >
                   <Icon name="edit" size={18} />
                 </button>
                 <button
-                  onClick={() => setDeleteId(v.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteId(v.id);
+                  }}
                   className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error"
                   aria-label="Delete"
                 >
@@ -251,6 +262,8 @@ export function Fleet() {
           columns={columns}
           rows={rows}
           rowKey={(v) => v.id}
+          onRowClick={(v) => setDetailVehicle(v)}
+          pageSize={10}
           empty={
             <EmptyState
               icon="local_shipping"
@@ -348,6 +361,79 @@ export function Fleet() {
           </Field>
         </form>
       </Modal>
+
+      {/* Detail Modal */}
+      {detailVehicle && (
+        <Modal
+          open={!!detailVehicle}
+          onClose={() => setDetailVehicle(null)}
+          title={`Vehicle: ${detailVehicle.registrationNo}`}
+          description={detailVehicle.name}
+          icon="local_shipping"
+          footer={
+            <Button variant="outline" onClick={() => setDetailVehicle(null)}>
+              Close
+            </Button>
+          }
+        >
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4 rounded-xl border border-white/10 bg-surface-container-high/40 p-4 sm:grid-cols-4">
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Type</p>
+                <p className="font-medium text-on-surface">{detailVehicle.type}</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Status</p>
+                <p className="font-medium text-on-surface">{detailVehicle.status}</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Capacity</p>
+                <p className="font-mono text-on-surface">{formatNumber(detailVehicle.capacityKg)} kg</p>
+              </div>
+              <div>
+                <p className="font-label-sm text-label-sm text-on-surface-variant">Odometer</p>
+                <p className="font-mono text-on-surface">{formatNumber(detailVehicle.odometer)} km</p>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-label-md text-label-md font-bold text-on-surface">Recent Trips</h4>
+              <ul className="mt-2 divide-y divide-white/5 rounded-lg border border-white/10">
+                {db.trips
+                  .filter((t) => t.vehicleId === detailVehicle.id)
+                  .slice(0, 3)
+                  .map((t) => (
+                    <li key={t.id} className="flex justify-between p-3 text-body-md">
+                      <span className="text-on-surface">{t.source} → {t.destination}</span>
+                      <span className="font-mono text-on-surface-variant">{t.status}</span>
+                    </li>
+                  ))}
+                {db.trips.filter((t) => t.vehicleId === detailVehicle.id).length === 0 && (
+                  <li className="p-3 text-body-sm text-on-surface-variant">No trips recorded.</li>
+                )}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-label-md text-label-md font-bold text-on-surface">Recent Maintenance</h4>
+              <ul className="mt-2 divide-y divide-white/5 rounded-lg border border-white/10">
+                {db.maintenance
+                  .filter((m) => m.vehicleId === detailVehicle.id)
+                  .slice(0, 3)
+                  .map((m) => (
+                    <li key={m.id} className="flex justify-between p-3 text-body-md">
+                      <span className="text-on-surface">{m.serviceType}</span>
+                      <span className="font-mono text-on-surface-variant">{formatCurrency(m.cost, db.settings.currency)}</span>
+                    </li>
+                  ))}
+                {db.maintenance.filter((m) => m.vehicleId === detailVehicle.id).length === 0 && (
+                  <li className="p-3 text-body-sm text-on-surface-variant">No maintenance recorded.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       <ConfirmDialog
         open={!!deleteId}

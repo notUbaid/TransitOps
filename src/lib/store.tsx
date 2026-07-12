@@ -94,6 +94,7 @@ interface StoreValue {
   deleteDriver: (id: string) => ActionResult;
   // trips
   createTrip: (input: CreateTripInput) => ActionResult<Trip>;
+  updateTrip: (id: string, input: Partial<CreateTripInput>) => ActionResult<Trip>;
   dispatchTrip: (id: string) => ActionResult<Trip>;
   completeTrip: (id: string, input: CompleteTripInput) => ActionResult<Trip>;
   cancelTrip: (id: string, note?: string) => ActionResult<Trip>;
@@ -351,6 +352,45 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
+  const updateTrip = useCallback<StoreValue["updateTrip"]>(
+    (id, input) => {
+      const cur = dbRef.current;
+      const trip = cur.trips.find((t) => t.id === id);
+      if (!trip) return { ok: false, error: "Trip not found." };
+      if (trip.status !== "DRAFT") return { ok: false, error: "Only draft trips can be updated." };
+
+      if (input.cargoKg !== undefined && input.cargoKg <= 0) {
+        return { ok: false, error: "Cargo weight must be greater than zero." };
+      }
+
+      const vehicleId = input.vehicleId !== undefined ? input.vehicleId : trip.vehicleId;
+      const vehicle = vehicleId ? cur.vehicles.find((v) => v.id === vehicleId) : undefined;
+      const cargoKg = input.cargoKg !== undefined ? input.cargoKg : trip.cargoKg;
+
+      if (vehicle && cargoKg > vehicle.capacityKg) {
+        return {
+          ok: false,
+          error: `Capacity exceeded: cargo ${cargoKg} kg > ${vehicle.capacityKg} kg limit on ${vehicle.registrationNo}.`,
+        };
+      }
+
+      const updated = {
+        ...trip,
+        ...(input.source !== undefined && { source: input.source.trim() }),
+        ...(input.destination !== undefined && { destination: input.destination.trim() }),
+        ...(input.vehicleId !== undefined && { vehicleId: input.vehicleId }),
+        ...(input.driverId !== undefined && { driverId: input.driverId }),
+        ...(input.cargoKg !== undefined && { cargoKg }),
+        ...(input.plannedKm !== undefined && { plannedKm: input.plannedKm }),
+        ...(input.revenue !== undefined && { revenue: input.revenue }),
+      };
+
+      commit({ ...cur, trips: cur.trips.map((t) => (t.id === id ? updated : t)) });
+      return { ok: true, data: updated };
+    },
+    [commit],
+  );
+
   const dispatchTrip = useCallback<StoreValue["dispatchTrip"]>(
     (id) => {
       const cur = dbRef.current;
@@ -418,9 +458,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           ? { ...v, status: v.status === "RETIRED" ? v.status : ("AVAILABLE" as const), odometer: Math.max(v.odometer, input.endOdometer) }
           : v,
       );
-      const drivers = cur.drivers.map((d) =>
-        d.id === trip.driverId && d.status === "ON_TRIP" ? { ...d, status: "AVAILABLE" as const } : d,
-      );
+      const drivers = cur.drivers.map((d) => {
+        if (d.id === trip.driverId) {
+          const completed = cur.trips.filter(t => t.driverId === d.id && t.status === "COMPLETED").length + 1;
+          const total = cur.trips.filter(t => t.driverId === d.id && t.status !== "DRAFT").length;
+          const rate = Math.round((completed / Math.max(1, total)) * 100);
+          const safety = Math.min(100, d.safetyScore + 2);
+          return {
+            ...d,
+            status: d.status === "ON_TRIP" ? "AVAILABLE" : d.status,
+            tripCompletionRate: rate,
+            safetyScore: safety
+          };
+        }
+        return d;
+      });
 
       // Auto-log the fuel expense for this trip
       const expenses = [...cur.expenses];
@@ -468,9 +520,21 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           )
         : cur.vehicles;
       const drivers = wasDispatched
-        ? cur.drivers.map((d) =>
-            d.id === trip.driverId && d.status === "ON_TRIP" ? { ...d, status: "AVAILABLE" as const } : d,
-          )
+        ? cur.drivers.map((d) => {
+            if (d.id === trip.driverId) {
+              const completed = cur.trips.filter(t => t.driverId === d.id && t.status === "COMPLETED").length;
+              const total = cur.trips.filter(t => t.driverId === d.id && t.status !== "DRAFT").length;
+              const rate = Math.round((completed / Math.max(1, total)) * 100);
+              const safety = Math.max(0, d.safetyScore - 5);
+              return {
+                ...d,
+                status: d.status === "ON_TRIP" ? "AVAILABLE" : d.status,
+                tripCompletionRate: rate,
+                safetyScore: safety
+              };
+            }
+            return d;
+          })
         : cur.drivers;
 
       commit({ ...cur, trips: cur.trips.map((t) => (t.id === id ? updated : t)), vehicles, drivers });
@@ -625,6 +689,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     updateDriver,
     deleteDriver,
     createTrip,
+    updateTrip,
     dispatchTrip,
     completeTrip,
     cancelTrip,
