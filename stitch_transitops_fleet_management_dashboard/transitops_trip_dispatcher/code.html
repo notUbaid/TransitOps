@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Trip Dispatcher</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#b7c8e1",
+                        "inverse-on-surface": "#2e3038",
+                        "surface": "#10131a",
+                        "on-background": "#e1e2ec",
+                        "secondary-container": "#3a4a5f",
+                        "on-secondary-container": "#a9bad3",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-error": "#690005",
+                        "outline-variant": "#424754",
+                        "surface-variant": "#32353c",
+                        "error": "#ffb4ab",
+                        "surface-dim": "#10131a",
+                        "surface-container": "#1d2027",
+                        "outline": "#8c909f",
+                        "surface-container-lowest": "#0b0e15",
+                        "primary-fixed": "#d8e2ff",
+                        "on-primary-container": "#00285d",
+                        "on-primary": "#002e6a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-surface": "#e1e2ec",
+                        "tertiary-fixed": "#ffdcc6",
+                        "on-surface-variant": "#c2c6d6",
+                        "tertiary-container": "#df7412",
+                        "inverse-primary": "#005ac2",
+                        "tertiary": "#ffb786",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "error-container": "#93000a",
+                        "on-tertiary-container": "#461f00",
+                        "inverse-surface": "#e1e2ec",
+                        "on-error-container": "#ffdad6",
+                        "background": "#10131a",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-highest": "#32353c",
+                        "surface-tint": "#adc6ff",
+                        "secondary-fixed": "#d3e4fe",
+                        "primary-fixed-dim": "#adc6ff",
+                        "on-tertiary-fixed": "#311400",
+                        "on-tertiary": "#502400",
+                        "surface-bright": "#363941",
+                        "on-primary-fixed": "#001a42",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-secondary": "#213145",
+                        "primary-container": "#4d8eff",
+                        "primary": "#adc6ff",
+                        "surface-container-low": "#191b23",
+                        "surface-container-high": "#272a31"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "lg": "24px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "container-margin": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "headline-md": ["Inter"],
+                        "display": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+        }
+        .input-dark {
+            background: #0f172a;
+            border: 1px solid #32353c;
+            color: #e1e2ec;
+        }
+        .input-dark:focus {
+            border-color: #adc6ff;
+            box-shadow: 0 0 0 1px #adc6ff;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- SideNavBar -->
+<nav class="hidden md:flex bg-surface-container dark:bg-surface-container fixed left-0 top-0 bottom-0 w-[280px] border-r border-white/10 shadow-xl flex-col h-full py-6 px-4 space-y-2 z-50">
+<div class="mb-8 px-4">
+<h1 class="font-headline-md text-headline-md font-black tracking-tight text-primary">TransitOps</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Fleet Management</p>
+</div>
+<div class="flex-1 space-y-1">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="local_shipping">local_shipping</span>
+<span class="font-label-md text-label-md">Fleet</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="badge">badge</span>
+<span class="font-label-md text-label-md">Drivers</span>
+</a>
+<!-- Active Tab: Trips -->
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-bold hover:bg-white/5 transition-all duration-200 translate-x-1" href="#">
+<span class="material-symbols-outlined" data-icon="route">route</span>
+<span class="font-label-md text-label-md">Trips</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="local_gas_station">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel &amp; Expenses</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</div>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-primary-fixed-dim transition-colors mt-4">
+            New Report
+        </button>
+<div class="mt-4 pt-4 border-t border-white/10 space-y-1">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="md:ml-[280px] min-h-screen flex flex-col relative overflow-hidden">
+<!-- Background Shader/Atmosphere -->
+<div class="absolute inset-0 z-0 pointer-events-none opacity-20">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary-container rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-tertiary-container rounded-full blur-[120px]"></div>
+</div>
+<!-- TopNavBar -->
+<header class="bg-surface/80 backdrop-blur-md dark:bg-surface/80 border-b border-white/10 shadow-sm fixed top-0 right-0 left-0 md:left-[280px] h-16 flex items-center justify-between px-6 z-40">
+<div class="flex items-center w-full max-w-md">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container border-none rounded-full py-2 pl-10 pr-4 text-on-surface focus:ring-1 focus:ring-primary font-body-md text-sm placeholder-on-surface-variant" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-4">
+<div class="hidden sm:flex space-x-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-variant/50 transition-colors duration-200 rounded-full">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+</div>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-on-surface hidden sm:block">Support</button>
+<button class="bg-primary text-on-primary font-label-md px-4 py-2 rounded-full hover:bg-primary-fixed-dim transition-colors whitespace-nowrap">
+                    Dispatch Trip
+                </button>
+<div class="w-8 h-8 rounded-full bg-secondary-container overflow-hidden border border-white/10 ml-2">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A futuristic, moody corporate headshot of a logistics dispatcher in a high-tech control room, dramatic lighting, sharp focus, 8k resolution, professional attire." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_6N5A4OKckU-Xrr3HCsY2ypmo6gjCbRUJQ18w1vuy-2tzlCCr52ckKugOLkknSEWg1NefT1O9AMLNBpVT4QJiud_Xu892VMzWWsdrA4B2mNVsvlwW_ysq656dUbvGccV_cRp0BDdZhLJknXfhQl7yuzSAVL8gZRvBZEi5SYRfquITNCxbc8skBxjuigALx7NuziwGinzLXO0OIH_v6l0vd4Mu6Amotq-iHaqRGMH7DpStfYRk0uUS"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 mt-16 p-4 md:p-6 lg:p-8 z-10 overflow-y-auto">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Header & Stepper -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 glass-card p-6 rounded-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Trip Dispatcher</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Plan, validate, and launch new logistics routes.</p>
+</div>
+<!-- Stepper -->
+<div class="flex items-center space-x-2 md:space-x-4 w-full md:w-auto">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-sm mb-1 ring-2 ring-primary/30">1</div>
+<span class="font-label-sm text-label-sm text-primary">Draft</span>
+</div>
+<div class="w-12 h-0.5 bg-primary/30 mt-[-16px]"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-sm mb-1">2</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Dispatched</span>
+</div>
+<div class="w-12 h-0.5 bg-surface-variant mt-[-16px]"></div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-sm mb-1">3</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Completed</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Create Trip Form -->
+<div class="lg:col-span-7 space-y-6">
+<div class="glass-card rounded-xl p-6">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-6 border-b border-white/10 pb-4">Create Trip</h3>
+<form class="space-y-5">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Source</label>
+<input class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0" placeholder="e.g., Gandhinagar Depot" type="text"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Destination</label>
+<input class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0" placeholder="e.g., Ahmedabad Hub" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Vehicle (Available Only)</label>
+<select class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0 appearance-none">
+<option>VAN-05 - 500 kg capacity</option>
+<option>TRUCK-11 - 5 Ton capacity</option>
+</select>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Driver (Available Only)</label>
+<select class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0 appearance-none">
+<option>Alex M.</option>
+<option>Sarah K.</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+<div class="space-y-1 relative">
+<label class="font-label-md text-label-md text-on-surface-variant block">Cargo Weight (kg)</label>
+<input class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0 border-error/50" type="number" value="700"/>
+</div>
+<div class="space-y-1">
+<label class="font-label-md text-label-md text-on-surface-variant block">Planned Distance (km)</label>
+<input class="w-full input-dark rounded-lg py-2 px-3 text-sm focus:ring-0" type="number" value="35"/>
+</div>
+</div>
+<!-- Validation Error -->
+<div class="bg-error-container/20 border border-error/50 rounded-lg p-4 flex items-start gap-3">
+<span class="material-symbols-outlined text-error mt-0.5" data-icon="error">error</span>
+<div>
+<p class="text-error font-label-md font-bold">Vehicle Capacity: 500 kg</p>
+<p class="text-on-surface-variant font-body-md text-sm mt-1">Cargo weight: 700 kg</p>
+<p class="text-error font-body-md font-medium text-sm mt-1">Capacity exceeded by 200 kg — dispatch blocked</p>
+</div>
+</div>
+<div class="pt-4 flex justify-end gap-3 border-t border-white/10 mt-6">
+<button class="px-5 py-2 rounded-lg border border-white/10 text-on-surface hover:bg-surface-variant transition-colors font-label-md" type="button">Cancel</button>
+<button class="px-5 py-2 rounded-lg bg-surface-variant text-on-surface-variant cursor-not-allowed font-label-md" disabled="" type="button">Dispatch (Disabled)</button>
+</div>
+</form>
+</div>
+</div>
+<!-- Right Column: Live Board -->
+<div class="lg:col-span-5 space-y-4">
+<div class="flex items-center justify-between mb-2 px-2">
+<h3 class="font-headline-md text-headline-md text-on-surface">Live Board</h3>
+<span class="bg-primary/20 text-primary px-2 py-1 rounded text-xs font-bold font-label-sm tracking-wider">3 ACTIVE</span>
+</div>
+<!-- Card 1 -->
+<div class="glass-card rounded-xl p-5 hover:border-primary/50 transition-colors cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<div class="flex justify-between items-start mb-3">
+<div>
+<span class="font-label-sm text-primary bg-primary/10 px-2 py-0.5 rounded">TR001</span>
+<h4 class="font-body-md font-medium text-on-surface mt-2">Gandhinagar Depot → Ahmedabad Hub</h4>
+</div>
+<span class="bg-primary text-on-primary font-label-sm px-2 py-1 rounded">Dispatched</span>
+</div>
+<div class="flex justify-between items-center text-sm mt-4 text-on-surface-variant">
+<div class="flex items-center gap-1 font-label-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="local_shipping">local_shipping</span> VAN-05 / ALEX
+                                </div>
+<div class="font-label-sm">45 min est.</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="glass-card rounded-xl p-5 hover:border-secondary/50 transition-colors cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<div class="flex justify-between items-start mb-3">
+<div>
+<span class="font-label-sm text-secondary bg-secondary/10 px-2 py-0.5 rounded">TR004</span>
+<h4 class="font-body-md font-medium text-on-surface mt-2">Vatva Industrial Area → Sanand Warehouse</h4>
+</div>
+<span class="bg-surface-variant text-on-surface font-label-sm px-2 py-1 rounded border border-white/10">Draft</span>
+</div>
+<div class="flex justify-between items-center text-sm mt-4 text-on-surface-variant">
+<div class="flex items-center gap-1 font-label-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="local_shipping">local_shipping</span> TRUCK-04 / SURESH
+                                </div>
+<div class="font-label-sm text-secondary">Awaiting driver</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="glass-card rounded-xl p-5 border-error/30 hover:border-error transition-colors cursor-pointer relative overflow-hidden group">
+<div class="absolute top-0 left-0 w-1 h-full bg-error"></div>
+<div class="flex justify-between items-start mb-3">
+<div>
+<span class="font-label-sm text-error bg-error/10 px-2 py-0.5 rounded">TR006</span>
+<h4 class="font-body-md font-medium text-on-surface mt-2">Mehsana → Kalol Depot</h4>
+</div>
+<span class="bg-error/20 text-error border border-error/30 font-label-sm px-2 py-1 rounded">Cancelled</span>
+</div>
+<div class="flex justify-between items-center text-sm mt-4 text-on-surface-variant">
+<div class="flex items-center gap-1 font-label-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="warning">warning</span> Unassigned
+                                </div>
+<div class="font-label-sm text-error">Vehicle sent to shop</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

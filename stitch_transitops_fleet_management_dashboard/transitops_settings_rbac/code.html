@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Settings &amp; RBAC</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "tertiary-container": "#df7412",
+                        "on-tertiary-fixed": "#311400",
+                        "on-error": "#690005",
+                        "on-secondary": "#213145",
+                        "secondary-container": "#3a4a5f",
+                        "on-tertiary-fixed-variant": "#723600",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-highest": "#32353c",
+                        "tertiary": "#ffb786",
+                        "inverse-on-surface": "#2e3038",
+                        "surface-container": "#1d2027",
+                        "outline-variant": "#424754",
+                        "on-tertiary-container": "#461f00",
+                        "on-secondary-fixed": "#0b1c30",
+                        "primary-fixed": "#d8e2ff",
+                        "primary-fixed-dim": "#adc6ff",
+                        "surface-tint": "#adc6ff",
+                        "surface-container-high": "#272a31",
+                        "on-primary-container": "#00285d",
+                        "secondary-fixed": "#d3e4fe",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-container-lowest": "#0b0e15",
+                        "on-primary": "#002e6a",
+                        "background": "#10131a",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#363941",
+                        "primary": "#adc6ff",
+                        "on-background": "#e1e2ec",
+                        "inverse-primary": "#005ac2",
+                        "secondary": "#b7c8e1",
+                        "primary-container": "#4d8eff",
+                        "on-tertiary": "#502400",
+                        "surface-container-low": "#191b23",
+                        "on-primary-fixed-variant": "#004395",
+                        "on-primary-fixed": "#001a42",
+                        "inverse-surface": "#e1e2ec",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#c2c6d6",
+                        "outline": "#8c909f",
+                        "on-surface": "#e1e2ec",
+                        "on-secondary-container": "#a9bad3",
+                        "surface": "#10131a",
+                        "tertiary-fixed": "#ffdcc6",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#ffb786",
+                        "surface-variant": "#32353c",
+                        "surface-dim": "#10131a"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "xs": "4px",
+                        "xl": "32px",
+                        "container-margin": "24px",
+                        "base": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "gutter": "16px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "label-md": ["JetBrains Mono"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "display": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background-color: rgba(30, 41, 59, 0.8); /* Slate 800 with opacity */
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-input {
+            background-color: #0f172a; /* Base slate */
+            border: 1px solid #1e293b; /* Surface gray */
+        }
+        .glass-input:focus {
+            border-color: #adc6ff; /* Primary Blue */
+            box-shadow: 0 0 8px rgba(173, 198, 255, 0.2);
+        }
+        
+        /* Checkbox styling */
+        .custom-checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background-color: transparent;
+            border: 1px solid #424754;
+            border-radius: 0.125rem;
+            position: relative;
+            cursor: pointer;
+        }
+        .custom-checkbox:checked {
+            background-color: #adc6ff;
+            border-color: #adc6ff;
+        }
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 4px;
+            height: 8px;
+            border: solid #002e6a;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .custom-checkbox:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full w-[280px] flex-col py-lg px-md bg-surface-container dark:bg-surface-container border-r border-outline-variant/10 shadow-md z-50">
+<div class="flex items-center gap-sm mb-xl px-sm">
+<img class="w-8 h-8 rounded-DEFAULT object-cover" data-alt="A highly detailed 50-100 word prompt for a futuristic, geometric transit logo featuring interlocking lines representing routes, using a primary blue and white color palette, set against a dark slate background to match the enterprise dark mode UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdt7NiWprt_Mks5Mw-UpNLScytrQiyPpQM8VQ0OPTWCxelKkQny-381urtw9fPO87o_LQkzKe4CR6qzaCcmnwgQj83-gjUO4RVgwzTI9JvJSB1STMIkR2R4hPS28sNGzEXtMJZglQtZnxxbmNd4XpcuNlXs5LPMFfO_WkyjN0DKdlf_P7xRAXfwns5GGMCSaXYthiEjuvcdaBKLe3GyBESlF3uvp06VtMkrQ8053kZ1FR6Ze_3TxxL"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary">TransitOps</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Enterprise Fleet</p>
+</div>
+</div>
+<ul class="flex flex-col gap-xs flex-1">
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>Dashboard</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="directions_bus">directions_bus</span>Vehicles</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="person_pin_circle">person_pin_circle</span>Drivers</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="route">route</span>Trips</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="build">build</span>Maintenance</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="local_gas_station">local_gas_station</span>Fuel &amp; Expenses</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>Reports</a></li>
+<li><a class="flex items-center gap-sm px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary/5 hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#"><span class="material-symbols-outlined" data-icon="settings">settings</span>Settings</a></li>
+</ul>
+</nav>
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-280px)] h-16 bg-surface/80 backdrop-blur-md dark:bg-surface/80 border-b border-outline-variant/10 flex justify-between items-center px-lg z-40 hidden md:flex">
+<div class="flex-1 max-w-md focus-within:ring-1 focus-within:ring-primary rounded-full px-sm py-xs bg-surface-container-low flex items-center">
+<span class="material-symbols-outlined text-on-surface-variant ml-sm" data-icon="search">search</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/50" placeholder="Search settings..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-all p-sm rounded-full hover:bg-surface-container-high"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-on-surface-variant hover:text-primary transition-all p-sm rounded-full hover:bg-surface-container-high"><span class="material-symbols-outlined" data-icon="help">help</span></button>
+<button class="flex items-center justify-center w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant/20 hover:border-primary transition-all">
+<img class="w-full h-full object-cover" data-alt="A highly detailed 50-100 word prompt for a professional headshot of a fleet manager, wearing a crisp dark uniform shirt, softly lit with cinematic rim lighting in a high-tech control room environment, matching the dark mode enterprise UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXdIDlphCbV_d5ldZuzlZ664SaZX1kap960SwGXDCP47hUKtgLIwD13I79fy-Jms31HWFRtTzGvlyn5YKoXt_sBqtlFiXhUhKNVeXjC7mVZua7dnwEWY9CFvZQbjfUkf8nSPMxO8i9dSJ3-3X5_XgiYbpQe6LUCr_uqNEFHhRQjgZ9oep9VYmKT1G3M4J0QOptigIGksVoTa_N-4UsaVZMYAU66AiKX_LSA61hhLhPVF0AlTMVxv4e"/>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="w-full md:pl-[280px] pt-16 md:pt-24 p-md md:p-lg lg:p-xl flex flex-col gap-lg md:gap-xl max-w-[1600px] mx-auto overflow-y-auto h-screen">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Platform Settings</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">Manage your operational preferences and configure role-based access for your organization.</p>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg md:gap-xl">
+<!-- Left Col: General Settings (Bento style card) -->
+<section class="lg:col-span-1 glass-panel rounded-xl p-lg flex flex-col gap-md">
+<div class="flex items-center gap-sm mb-sm border-b border-outline-variant/20 pb-sm">
+<span class="material-symbols-outlined text-primary" data-icon="tune">tune</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">General Settings</h3>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Depot Name</label>
+<input class="glass-input rounded-lg px-md py-sm font-body-md text-body-md text-on-surface w-full focus:outline-none transition-all" type="text" value="Gandhinagar Depot G124"/>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Currency</label>
+<div class="relative">
+<select class="glass-input rounded-lg px-md py-sm font-body-md text-body-md text-on-surface w-full focus:outline-none transition-all appearance-none cursor-pointer">
+<option selected="" value="INR">INR (₹) - Indian Rupee</option>
+<option value="USD">USD ($) - US Dollar</option>
+<option value="EUR">EUR (€) - Euro</option>
+</select>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none" data-icon="expand_more">expand_more</span>
+</div>
+</div>
+<div class="flex flex-col gap-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Distance Unit</label>
+<div class="flex gap-sm">
+<label class="flex-1 flex items-center justify-center gap-xs p-sm rounded-lg border border-primary bg-primary/10 cursor-pointer transition-colors">
+<input checked="" class="hidden" name="distance" type="radio" value="km"/>
+<span class="font-label-sm text-label-sm text-primary">Kilometers</span>
+</label>
+<label class="flex-1 flex items-center justify-center gap-xs p-sm rounded-lg border border-outline-variant/30 hover:border-outline-variant cursor-pointer transition-colors text-on-surface-variant hover:text-on-surface">
+<input class="hidden" name="distance" type="radio" value="mi"/>
+<span class="font-label-sm text-label-sm">Miles</span>
+</label>
+</div>
+</div>
+<div class="mt-auto pt-lg">
+<button class="w-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md py-sm px-md rounded-lg transition-colors flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="save">save</span>
+                        Save Changes
+                    </button>
+</div>
+</section>
+<!-- Right Col: RBAC Matrix -->
+<section class="lg:col-span-2 glass-panel rounded-xl p-lg flex flex-col gap-md overflow-hidden">
+<div class="flex items-center justify-between mb-sm border-b border-outline-variant/20 pb-sm">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary" data-icon="shield_person">shield_person</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Role-Based Access Control</h3>
+</div>
+<button class="text-primary hover:text-primary-fixed font-label-sm text-label-sm flex items-center gap-xs transition-colors">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span> Add Role
+                    </button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm mb-md">Define permissions for system modules across organizational roles. Changes take effect on next user login.</p>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 font-label-sm text-label-sm text-on-surface-variant uppercase">
+<th class="p-sm md:p-md rounded-tl-lg font-medium w-1/3">Role</th>
+<th class="p-sm md:p-md font-medium text-center">Fleet</th>
+<th class="p-sm md:p-md font-medium text-center">Drivers</th>
+<th class="p-sm md:p-md font-medium text-center">Trips</th>
+<th class="p-sm md:p-md font-medium text-center">Fuel/Exp</th>
+<th class="p-sm md:p-md rounded-tr-lg font-medium text-center">Analytics</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface divide-y divide-outline-variant/20">
+<!-- Fleet Manager -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-sm md:p-md">
+<div class="flex flex-col">
+<span class="font-medium text-primary-fixed-dim">Fleet Manager</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Full System Access</span>
+</div>
+</td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox border-primary bg-primary/20 cursor-default opacity-100" disabled="" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox border-primary bg-primary/20 cursor-default opacity-100" disabled="" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox border-primary bg-primary/20 cursor-default opacity-100" disabled="" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox border-primary bg-primary/20 cursor-default opacity-100" disabled="" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox border-primary bg-primary/20 cursor-default opacity-100" disabled="" type="checkbox"/></td>
+</tr>
+<!-- Dispatcher -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-sm md:p-md">
+<div class="flex flex-col">
+<span class="font-medium">Dispatcher</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Operations Focus</span>
+</div>
+</td>
+<td class="p-sm md:p-md text-center"><span class="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-xs py-1 rounded">View</span></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><span class="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-xs py-1 rounded">View</span></td>
+</tr>
+<!-- Safety Officer -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-sm md:p-md">
+<div class="flex flex-col">
+<span class="font-medium">Safety Officer</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Compliance &amp; Maint.</span>
+</div>
+</td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><span class="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-xs py-1 rounded">View</span></td>
+<td class="p-sm md:p-md text-center"><input class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input class="custom-checkbox" type="checkbox"/></td>
+</tr>
+<!-- Financial Analyst -->
+<tr class="hover:bg-primary/5 transition-colors group">
+<td class="p-sm md:p-md">
+<div class="flex flex-col">
+<span class="font-medium">Financial Analyst</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Cost Tracking</span>
+</div>
+</td>
+<td class="p-sm md:p-md text-center"><span class="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-xs py-1 rounded">View</span></td>
+<td class="p-sm md:p-md text-center"><input class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><span class="font-label-sm text-label-sm text-secondary bg-secondary-container/30 px-xs py-1 rounded">View</span></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+<td class="p-sm md:p-md text-center"><input checked="" class="custom-checkbox" type="checkbox"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="mt-sm flex justify-end gap-sm">
+<button class="border border-outline-variant/30 hover:border-outline-variant hover:bg-surface-container-high text-on-surface font-label-md text-label-md py-sm px-md rounded-lg transition-colors">Discard</button>
+<button class="bg-surface-container-highest border border-primary/30 text-primary hover:bg-primary/10 font-label-md text-label-md py-sm px-md rounded-lg transition-colors">Apply Matrix</button>
+</div>
+</section>
+</div>
+</main>
+<script>
+        // Simple script to handle custom radio button styling logic if needed beyond pure CSS
+        const distanceRadios = document.querySelectorAll('input[name="distance"]');
+        distanceRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Reset all labels
+                distanceRadios.forEach(r => {
+                    const label = r.closest('label');
+                    label.classList.remove('border-primary', 'bg-primary/10');
+                    label.classList.add('border-outline-variant/30', 'text-on-surface-variant');
+                    const span = label.querySelector('span');
+                    span.classList.remove('text-primary');
+                });
+                
+                // Style active label
+                if (this.checked) {
+                    const activeLabel = this.closest('label');
+                    activeLabel.classList.remove('border-outline-variant/30', 'text-on-surface-variant');
+                    activeLabel.classList.add('border-primary', 'bg-primary/10');
+                    const activeSpan = activeLabel.querySelector('span');
+                    activeSpan.classList.add('text-primary');
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TransitOps - Fuel &amp; Expenses</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#b7c8e1",
+                    "inverse-on-surface": "#2e3038",
+                    "surface": "#10131a",
+                    "on-background": "#e1e2ec",
+                    "secondary-container": "#3a4a5f",
+                    "on-secondary-container": "#a9bad3",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "on-error": "#690005",
+                    "outline-variant": "#424754",
+                    "surface-variant": "#32353c",
+                    "error": "#ffb4ab",
+                    "surface-dim": "#10131a",
+                    "surface-container": "#1d2027",
+                    "outline": "#8c909f",
+                    "surface-container-lowest": "#0b0e15",
+                    "primary-fixed": "#d8e2ff",
+                    "on-primary-container": "#00285d",
+                    "on-primary": "#002e6a",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "on-surface": "#e1e2ec",
+                    "tertiary-fixed": "#ffdcc6",
+                    "on-surface-variant": "#c2c6d6",
+                    "tertiary-container": "#df7412",
+                    "inverse-primary": "#005ac2",
+                    "tertiary": "#ffb786",
+                    "tertiary-fixed-dim": "#ffb786",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#461f00",
+                    "inverse-surface": "#e1e2ec",
+                    "on-error-container": "#ffdad6",
+                    "background": "#10131a",
+                    "on-secondary-fixed": "#0b1c30",
+                    "surface-container-highest": "#32353c",
+                    "surface-tint": "#adc6ff",
+                    "secondary-fixed": "#d3e4fe",
+                    "primary-fixed-dim": "#adc6ff",
+                    "on-tertiary-fixed": "#311400",
+                    "on-tertiary": "#502400",
+                    "surface-bright": "#363941",
+                    "on-primary-fixed": "#001a42",
+                    "on-primary-fixed-variant": "#004395",
+                    "on-secondary": "#213145",
+                    "primary-container": "#4d8eff",
+                    "primary": "#adc6ff",
+                    "surface-container-low": "#191b23",
+                    "surface-container-high": "#272a31"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "xs": "4px",
+                    "gutter": "16px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "container-margin": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "label-sm": [
+                            "JetBrains Mono"
+                    ],
+                    "label-md": [
+                            "JetBrains Mono"
+                    ],
+                    "headline-md": [
+                            "Inter"
+                    ],
+                    "display": [
+                            "Inter"
+                    ],
+                    "headline-lg-mobile": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "label-sm": [
+                            "10px",
+                            {
+                                    "lineHeight": "14px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-md": [
+                            "12px",
+                            {
+                                    "lineHeight": "16px",
+                                    "letterSpacing": "0.05em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display": [
+                            "36px",
+                            {
+                                    "lineHeight": "44px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-lg-mobile": [
+                            "24px",
+                            {
+                                    "lineHeight": "32px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0f172a;
+            color: #e1e2ec;
+        }
+        
+        .glass-panel {
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        
+        .data-table th {
+            border-bottom: 1px solid #334155;
+            text-align: left;
+            padding: 8px;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+        
+        .data-table td {
+            border-bottom: 1px solid #334155;
+            padding: 8px;
+        }
+        
+        .data-table tr:hover td {
+            background-color: rgba(77, 142, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md min-h-screen overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-full py-6 px-4 space-y-2 fixed left-0 top-0 bottom-0 w-[280px] bg-surface-container shadow-xl z-50 border-r border-white/10">
+<div class="mb-8 px-4">
+<h1 class="font-headline-md text-headline-md font-black tracking-tight text-primary">TransitOps</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Fleet Management</p>
+</div>
+<button class="mb-6 mx-2 py-3 px-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Report
+        </button>
+<nav class="flex-1 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">local_shipping</span>
+<span class="font-label-md text-label-md">Fleet</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-label-md text-label-md">Drivers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">route</span>
+<span class="font-label-md text-label-md">Trips</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">build</span>
+<span class="font-label-md text-label-md">Maintenance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary-container text-on-primary-container font-bold hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">local_gas_station</span>
+<span class="font-label-md text-label-md">Fuel &amp; Expenses</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-4 border-t border-white/10 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="md:ml-[280px] min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-0 md:left-[280px] h-16 flex items-center justify-between px-6 z-40 bg-surface/80 backdrop-blur-md shadow-sm border-b border-white/10 transition-colors duration-200">
+<div class="flex items-center gap-4 flex-1">
+<!-- Mobile Menu Button -->
+<button class="md:hidden text-on-surface hover:bg-surface-variant/50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline-md text-headline-md font-bold text-on-surface md:hidden">TransitOps</div>
+<div class="hidden md:flex relative w-full max-w-md items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+<input class="w-full bg-[#0f172a] border border-surface-variant text-on-surface rounded-lg py-2 pl-10 pr-4 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary font-body-md transition-colors placeholder-on-surface-variant/50" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2 md:gap-4">
+<button class="hidden lg:flex items-center gap-2 bg-transparent border border-white/20 text-on-surface hover:bg-surface-variant/50 px-4 py-2 rounded-lg font-label-md text-label-md transition-colors">
+                    Support
+                </button>
+<button class="hidden md:flex items-center gap-2 bg-primary text-on-primary hover:opacity-90 px-4 py-2 rounded-lg font-label-md text-label-md transition-colors">
+                    Dispatch Trip
+                </button>
+<div class="flex items-center gap-1 border-l border-white/10 pl-2 md:pl-4 ml-2">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 p-2 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<button class="hidden sm:block text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full bg-surface-variant overflow-hidden border border-white/20 cursor-pointer hover:border-primary transition-colors">
+<img alt="User Profile Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of a logistics manager in a high-tech control room environment, dramatic lighting, sharp focus, 8k resolution, cinematic composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4buKnLUsZx-DOdLbL6sFtN63nhiwO1g9XUuHXC_ZHHjD2ZCg6zQ82lu1gLTclgWoL3-X9sSHq_aTwNu5n2VAWqt-Rw3WvYr58T8OBAq_Czg61aSRalGHiiCeLGF-rfLzoCtEJuG0CirXw1mdMyef0a-YPIdxKbUcbZXJ9HKUMt8zSwF4MuX39eRkxYqmOSDbs_5rYW78Po97WECp8DToqh5Ys03CvXz8D7aIewLmdtizNdaSsJ5WU"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<div class="flex-1 pt-24 px-4 md:px-6 pb-24">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Header -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-white/10 pb-4">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Fuel &amp; Expense Management</h2>
+<p class="font-body-md text-on-surface-variant mt-1">Track and manage operational costs across the fleet.</p>
+</div>
+<div class="flex gap-3">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">local_gas_station</span>
+                            Log Fuel
+                        </button>
+<button class="bg-transparent border border-outline-variant text-on-surface px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2 hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Add Expense
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column: Fuel Logs & Other Expenses -->
+<div class="lg:col-span-2 space-y-6">
+<!-- Fuel Logs Card -->
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">receipt_long</span>
+                                    Fuel Logs
+                                </h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full data-table font-body-md text-on-surface whitespace-nowrap">
+<thead>
+<tr class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="px-6 py-3">Vehicle</th>
+<th class="px-6 py-3">Date</th>
+<th class="px-6 py-3 text-right">Liters</th>
+<th class="px-6 py-3 text-right">Cost ($)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md">VAN-05</td>
+<td class="px-6 py-3 text-on-surface-variant">05 JUL 2024</td>
+<td class="px-6 py-3 text-right font-mono">42 L</td>
+<td class="px-6 py-3 text-right font-mono">31.50</td>
+</tr>
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md">TRUCK-11</td>
+<td class="px-6 py-3 text-on-surface-variant">06 JUL 2024</td>
+<td class="px-6 py-3 text-right font-mono">110 L</td>
+<td class="px-6 py-3 text-right font-mono">84.00</td>
+</tr>
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md">MINI-09</td>
+<td class="px-6 py-3 text-on-surface-variant">06 JUL 2024</td>
+<td class="px-6 py-3 text-right font-mono">28 L</td>
+<td class="px-6 py-3 text-right font-mono">20.50</td>
+</tr>
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md">VAN-02</td>
+<td class="px-6 py-3 text-on-surface-variant">07 JUL 2024</td>
+<td class="px-6 py-3 text-right font-mono">55 L</td>
+<td class="px-6 py-3 text-right font-mono">41.25</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Other Expenses Card -->
+<div class="glass-panel rounded-xl overflow-hidden flex flex-col">
+<div class="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-surface-container-low/50">
+<h3 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-tertiary">toll</span>
+                                    Other Expenses (Toll / Misc)
+                                </h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full data-table font-body-md text-on-surface whitespace-nowrap">
+<thead>
+<tr class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<th class="px-6 py-3">Trip ID</th>
+<th class="px-6 py-3">Vehicle</th>
+<th class="px-6 py-3 text-right">Toll ($)</th>
+<th class="px-6 py-3 text-right">Other ($)</th>
+<th class="px-6 py-3 text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md text-primary">TR001</td>
+<td class="px-6 py-3 font-label-md">VAN-05</td>
+<td class="px-6 py-3 text-right font-mono">12.00</td>
+<td class="px-6 py-3 text-right font-mono text-on-surface-variant">-</td>
+<td class="px-6 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-green-500/20 text-green-400 border border-green-500/30">APPROVED</span>
+</td>
+</tr>
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md text-primary">TR002</td>
+<td class="px-6 py-3 font-label-md">TRX-12</td>
+<td class="px-6 py-3 text-right font-mono">34.00</td>
+<td class="px-6 py-3 text-right font-mono">15.00</td>
+<td class="px-6 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-surface-variant text-on-surface-variant border border-white/10">PENDING</span>
+</td>
+</tr>
+<tr class="group transition-colors duration-150">
+<td class="px-6 py-3 font-label-md text-primary">TR004</td>
+<td class="px-6 py-3 font-label-md">MINI-09</td>
+<td class="px-6 py-3 text-right font-mono text-on-surface-variant">-</td>
+<td class="px-6 py-3 text-right font-mono">45.00</td>
+<td class="px-6 py-3 text-center">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-green-500/20 text-green-400 border border-green-500/30">APPROVED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Summary & Analytics Snapshot -->
+<div class="space-y-6">
+<!-- Cost Summary Widget -->
+<div class="glass-panel rounded-xl p-6 flex flex-col relative overflow-hidden">
+<!-- Subtle decorative background element -->
+<div class="absolute -top-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-2xl"></div>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-2">Total Operational Cost (Auto)</h3>
+<div class="text-xs text-on-surface-variant/70 mb-4 font-mono">Fuel + Maintenance + Tolls</div>
+<div class="flex items-baseline gap-2 mb-6">
+<span class="font-display text-[42px] font-bold text-primary tracking-tighter">$34,070</span>
+<span class="font-label-sm text-green-400 flex items-center">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 2.4%
+                                </span>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span> Fuel
+                                    </span>
+<span class="font-mono text-on-surface">$18,450</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-1.5">
+<div class="bg-primary h-1.5 rounded-full" style="width: 55%"></div>
+</div>
+<div class="flex justify-between items-center text-sm pt-2">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span> Maintenance
+                                    </span>
+<span class="font-mono text-on-surface">$12,120</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-1.5">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 35%"></div>
+</div>
+<div class="flex justify-between items-center text-sm pt-2">
+<span class="text-on-surface-variant flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-outline-variant"></span> Tolls/Misc
+                                    </span>
+<span class="font-mono text-on-surface">$3,500</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-1.5">
+<div class="bg-outline-variant h-1.5 rounded-full" style="width: 10%"></div>
+</div>
+</div>
+</div>
+<!-- Quick Actions or secondary info -->
+<div class="glass-panel rounded-xl p-6 border-t-[3px] border-t-tertiary">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-4">Pending Approvals</h3>
+<p class="font-body-sm text-on-surface-variant mb-4">You have 4 expense reports awaiting review.</p>
+<button class="w-full py-2 bg-surface-variant hover:bg-surface-bright text-on-surface rounded-lg font-label-md transition-colors border border-white/5">
+                                 Review Expenses
+                             </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
