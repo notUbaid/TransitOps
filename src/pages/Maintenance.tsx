@@ -71,9 +71,9 @@ export function Maintenance() {
     setModalOpen(true);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = addMaintenance({
+    const res = await addMaintenance({
       vehicleId: form.vehicleId,
       serviceType: form.serviceType,
       cost: form.cost,
@@ -89,15 +89,15 @@ export function Maintenance() {
     }
   };
 
-  const onComplete = () => {
+  const onComplete = async () => {
     if (!completeId) return;
-    const res = completeMaintenance(completeId);
+    const res = await completeMaintenance(completeId);
     if (res.ok) toast.success("Maintenance completed — vehicle released.");
     else toast.error(res.error);
   };
-  const onDelete = () => {
+  const onDelete = async () => {
     if (!deleteId) return;
-    const res = deleteMaintenance(deleteId);
+    const res = await deleteMaintenance(deleteId);
     if (res.ok) toast.success("Maintenance log deleted.");
     else toast.error(res.error);
   };

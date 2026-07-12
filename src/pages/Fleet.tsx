@@ -95,9 +95,9 @@ export function Fleet() {
     setModalOpen(true);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = editing ? updateVehicle(editing.id, form) : addVehicle(form);
+    const res = editing ? await updateVehicle(editing.id, form) : await addVehicle(form);
     if (res.ok) {
       toast.success(editing ? "Vehicle updated." : `Vehicle ${form.registrationNo.toUpperCase()} added.`);
       setModalOpen(false);
@@ -106,9 +106,9 @@ export function Fleet() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteId) return;
-    const res = deleteVehicle(deleteId);
+    const res = await deleteVehicle(deleteId);
     if (res.ok) toast.success("Vehicle deleted.");
     else toast.error(res.error);
   };

@@ -23,14 +23,14 @@ export function Settings() {
     setForm(db.settings);
   }, [db.settings]);
 
-  const save = (e: React.FormEvent) => {
+  const save = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateSettings(form);
+    await updateSettings(form);
     toast.success("Settings saved.");
   };
 
-  const onReset = () => {
-    resetDemoData();
+  const onReset = async () => {
+    await resetDemoData();
     setForm({ ...db.settings });
     toast.success("Demo data restored.");
   };

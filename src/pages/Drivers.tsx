@@ -97,13 +97,13 @@ export function Drivers() {
     setModalOpen(true);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const payload = {
       ...form,
       licenseExpiry: new Date(form.licenseExpiry).toISOString(),
     };
-    const res = editing ? updateDriver(editing.id, payload) : addDriver(payload);
+    const res = editing ? await updateDriver(editing.id, payload) : await addDriver(payload);
     if (res.ok) {
       toast.success(editing ? "Driver updated." : `Driver ${form.name} added.`);
       setModalOpen(false);
@@ -112,9 +112,9 @@ export function Drivers() {
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!deleteId) return;
-    const res = deleteDriver(deleteId);
+    const res = await deleteDriver(deleteId);
     if (res.ok) toast.success("Driver deleted.");
     else toast.error(res.error);
   };

@@ -84,9 +84,9 @@ export function Expenses() {
     setModalOpen(true);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = addExpense({
+    const res = await addExpense({
       type: form.type,
       vehicleId: form.vehicleId || null,
       tripId: form.tripId || null,
@@ -103,9 +103,9 @@ export function Expenses() {
     }
   };
 
-  const onDelete = () => {
+  const onDelete = async () => {
     if (!deleteId) return;
-    const res = deleteExpense(deleteId);
+    const res = await deleteExpense(deleteId);
     if (res.ok) toast.success("Expense deleted.");
     else toast.error(res.error);
   };

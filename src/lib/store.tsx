@@ -25,8 +25,30 @@ import { uid } from "./utils";
 
 const STORAGE_KEY = "transitops_db_v1";
 
-// ---- persistence ----
-function loadDatabase(): Database {
+const EMPTY_DB: Database = {
+  users: [],
+  vehicles: [],
+  drivers: [],
+  trips: [],
+  maintenance: [],
+  expenses: [],
+  settings: {
+    companyName: "TransitOps",
+    depotName: "Depot",
+    currency: "INR",
+    distanceUnit: "km",
+    fuelPricePerLiter: 104.5,
+    maintenanceAlertKm: 5000,
+    gstRate: 18,
+    contactEmail: "",
+    contactPhone: "",
+  },
+};
+
+const isApiMode = import.meta.env.PROD;
+
+// ---- localStorage helpers (dev mode) ----
+function loadFromLocalStorage(): Database {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -41,12 +63,27 @@ function loadDatabase(): Database {
   return buildSeedDatabase();
 }
 
-function saveDatabase(db: Database) {
+function saveToLocalStorage(db: Database) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
   } catch {
     /* ignore quota errors */
   }
+}
+
+// ---- API call helper (prod mode) ----
+async function apiPost(action: string, payload?: unknown) {
+  const res = await fetch("/api/db", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action, payload }),
+  });
+  return res.json() as Promise<{
+    ok: boolean;
+    data?: unknown;
+    db?: Database;
+    error?: string;
+  }>;
 }
 
 // ---- eligibility helpers (shared by validation + dropdowns) ----
@@ -82,33 +119,34 @@ export interface RegisterInput {
 
 interface StoreValue {
   db: Database;
+  loading: boolean;
   // auth
-  registerUser: (input: RegisterInput) => ActionResult<User>;
+  registerUser: (input: RegisterInput) => Promise<ActionResult<User>>;
   // vehicles
-  addVehicle: (input: Omit<Vehicle, "id" | "createdAt">) => ActionResult<Vehicle>;
-  updateVehicle: (id: string, patch: Partial<Vehicle>) => ActionResult<Vehicle>;
-  deleteVehicle: (id: string) => ActionResult;
+  addVehicle: (input: Omit<Vehicle, "id" | "createdAt">) => Promise<ActionResult<Vehicle>>;
+  updateVehicle: (id: string, patch: Partial<Vehicle>) => Promise<ActionResult<Vehicle>>;
+  deleteVehicle: (id: string) => Promise<ActionResult>;
   // drivers
-  addDriver: (input: Omit<Driver, "id" | "createdAt">) => ActionResult<Driver>;
-  updateDriver: (id: string, patch: Partial<Driver>) => ActionResult<Driver>;
-  deleteDriver: (id: string) => ActionResult;
+  addDriver: (input: Omit<Driver, "id" | "createdAt">) => Promise<ActionResult<Driver>>;
+  updateDriver: (id: string, patch: Partial<Driver>) => Promise<ActionResult<Driver>>;
+  deleteDriver: (id: string) => Promise<ActionResult>;
   // trips
-  createTrip: (input: CreateTripInput) => ActionResult<Trip>;
-  dispatchTrip: (id: string) => ActionResult<Trip>;
-  completeTrip: (id: string, input: CompleteTripInput) => ActionResult<Trip>;
-  cancelTrip: (id: string, note?: string) => ActionResult<Trip>;
-  deleteTrip: (id: string) => ActionResult;
+  createTrip: (input: CreateTripInput) => Promise<ActionResult<Trip>>;
+  dispatchTrip: (id: string) => Promise<ActionResult<Trip>>;
+  completeTrip: (id: string, input: CompleteTripInput) => Promise<ActionResult<Trip>>;
+  cancelTrip: (id: string, note?: string) => Promise<ActionResult<Trip>>;
+  deleteTrip: (id: string) => Promise<ActionResult>;
   // maintenance
-  addMaintenance: (input: Omit<MaintenanceLog, "id" | "createdAt">) => ActionResult<MaintenanceLog>;
-  completeMaintenance: (id: string) => ActionResult<MaintenanceLog>;
-  deleteMaintenance: (id: string) => ActionResult;
+  addMaintenance: (input: Omit<MaintenanceLog, "id" | "createdAt">) => Promise<ActionResult<MaintenanceLog>>;
+  completeMaintenance: (id: string) => Promise<ActionResult<MaintenanceLog>>;
+  deleteMaintenance: (id: string) => Promise<ActionResult>;
   // expenses
-  addExpense: (input: Omit<Expense, "id" | "createdAt">) => ActionResult<Expense>;
-  deleteExpense: (id: string) => ActionResult;
+  addExpense: (input: Omit<Expense, "id" | "createdAt">) => Promise<ActionResult<Expense>>;
+  deleteExpense: (id: string) => Promise<ActionResult>;
   // settings
-  updateSettings: (patch: Partial<Settings>) => ActionResult<Settings>;
+  updateSettings: (patch: Partial<Settings>) => Promise<ActionResult<Settings>>;
   // demo
-  resetDemoData: () => void;
+  resetDemoData: () => Promise<void>;
   // selectors
   dispatchableVehicles: () => Vehicle[];
   dispatchableDrivers: () => Driver[];
@@ -119,12 +157,34 @@ interface StoreValue {
 const StoreContext = createContext<StoreValue | null>(null);
 
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [db, setDb] = useState<Database>(() => loadDatabase());
+  const [db, setDb] = useState<Database>(() => {
+    if (isApiMode) return EMPTY_DB;
+    return loadFromLocalStorage();
+  });
+  const [loading, setLoading] = useState(isApiMode);
   const dbRef = useRef(db);
   dbRef.current = db;
 
+  // Initial load in API mode
   useEffect(() => {
-    saveDatabase(db);
+    if (!isApiMode) return;
+    fetch("/api/db")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.ok) {
+          setDb(json.data as Database);
+          dbRef.current = json.data as Database;
+        }
+      })
+      .catch((err) => console.error("Failed to load database:", err))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Persist to localStorage in dev mode
+  useEffect(() => {
+    if (!isApiMode) {
+      saveToLocalStorage(db);
+    }
   }, [db]);
 
   const commit = useCallback((next: Database) => {
@@ -134,7 +194,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Auth --------------------
   const registerUser = useCallback<StoreValue["registerUser"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("registerUser", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as User };
+        }
+        return { ok: false, error: json.error ?? "Registration failed." };
+      }
       const cur = dbRef.current;
       const name = input.name.trim();
       const email = input.email.trim().toLowerCase();
@@ -163,7 +231,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Vehicles --------------------
   const addVehicle = useCallback<StoreValue["addVehicle"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("addVehicle", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Vehicle };
+        }
+        return { ok: false, error: json.error ?? "Failed to add vehicle." };
+      }
       const cur = dbRef.current;
       const reg = input.registrationNo.trim().toUpperCase();
       if (!reg) return { ok: false, error: "Registration number is required." };
@@ -183,7 +259,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const updateVehicle = useCallback<StoreValue["updateVehicle"]>(
-    (id, patch) => {
+    async (id, patch) => {
+      if (isApiMode) {
+        const json = await apiPost("updateVehicle", { id, ...patch });
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Vehicle };
+        }
+        return { ok: false, error: json.error ?? "Failed to update vehicle." };
+      }
       const cur = dbRef.current;
       const existing = cur.vehicles.find((v) => v.id === id);
       if (!existing) return { ok: false, error: "Vehicle not found." };
@@ -202,7 +286,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteVehicle = useCallback<StoreValue["deleteVehicle"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("deleteVehicle", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true };
+        }
+        return { ok: false, error: json.error ?? "Failed to delete vehicle." };
+      }
       const cur = dbRef.current;
       const v = cur.vehicles.find((x) => x.id === id);
       if (!v) return { ok: false, error: "Vehicle not found." };
@@ -223,7 +315,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Drivers --------------------
   const addDriver = useCallback<StoreValue["addDriver"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("addDriver", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Driver };
+        }
+        return { ok: false, error: json.error ?? "Failed to add driver." };
+      }
       const cur = dbRef.current;
       const lic = input.licenseNumber.trim().toUpperCase();
       if (!lic) return { ok: false, error: "License number is required." };
@@ -243,7 +343,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const updateDriver = useCallback<StoreValue["updateDriver"]>(
-    (id, patch) => {
+    async (id, patch) => {
+      if (isApiMode) {
+        const json = await apiPost("updateDriver", { id, ...patch });
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Driver };
+        }
+        return { ok: false, error: json.error ?? "Failed to update driver." };
+      }
       const cur = dbRef.current;
       const existing = cur.drivers.find((d) => d.id === id);
       if (!existing) return { ok: false, error: "Driver not found." };
@@ -262,7 +370,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteDriver = useCallback<StoreValue["deleteDriver"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("deleteDriver", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true };
+        }
+        return { ok: false, error: json.error ?? "Failed to delete driver." };
+      }
       const cur = dbRef.current;
       const d = cur.drivers.find((x) => x.id === id);
       if (!d) return { ok: false, error: "Driver not found." };
@@ -286,7 +402,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   };
 
   const createTrip = useCallback<StoreValue["createTrip"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("createTrip", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Trip };
+        }
+        return { ok: false, error: json.error ?? "Failed to create trip." };
+      }
       const cur = dbRef.current;
       if (!input.source.trim() || !input.destination.trim()) {
         return { ok: false, error: "Source and destination are required." };
@@ -296,7 +420,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const vehicle = input.vehicleId ? cur.vehicles.find((v) => v.id === input.vehicleId) : undefined;
       const driver = input.driverId ? cur.drivers.find((d) => d.id === input.driverId) : undefined;
 
-      // Capacity check applies whenever a vehicle is chosen (rule 5)
       if (vehicle && input.cargoKg > vehicle.capacityKg) {
         return {
           ok: false,
@@ -352,7 +475,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const dispatchTrip = useCallback<StoreValue["dispatchTrip"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("dispatchTrip", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Trip };
+        }
+        return { ok: false, error: json.error ?? "Failed to dispatch trip." };
+      }
       const cur = dbRef.current;
       const trip = cur.trips.find((t) => t.id === id);
       if (!trip) return { ok: false, error: "Trip not found." };
@@ -392,7 +523,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const completeTrip = useCallback<StoreValue["completeTrip"]>(
-    (id, input) => {
+    async (id, input) => {
+      if (isApiMode) {
+        const json = await apiPost("completeTrip", { id, ...input });
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Trip };
+        }
+        return { ok: false, error: json.error ?? "Failed to complete trip." };
+      }
       const cur = dbRef.current;
       const trip = cur.trips.find((t) => t.id === id);
       if (!trip) return { ok: false, error: "Trip not found." };
@@ -412,7 +551,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         fuelLiters: input.fuelLiters,
       };
 
-      // Restore statuses (rule 7) and roll the vehicle odometer forward
       const vehicles = cur.vehicles.map((v) =>
         v.id === trip.vehicleId
           ? { ...v, status: v.status === "RETIRED" ? v.status : ("AVAILABLE" as const), odometer: Math.max(v.odometer, input.endOdometer) }
@@ -422,7 +560,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         d.id === trip.driverId && d.status === "ON_TRIP" ? { ...d, status: "AVAILABLE" as const } : d,
       );
 
-      // Auto-log the fuel expense for this trip
       const expenses = [...cur.expenses];
       if (input.fuelLiters > 0) {
         expenses.unshift({
@@ -451,7 +588,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const cancelTrip = useCallback<StoreValue["cancelTrip"]>(
-    (id, note) => {
+    async (id, note) => {
+      if (isApiMode) {
+        const json = await apiPost("cancelTrip", { id, note });
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Trip };
+        }
+        return { ok: false, error: json.error ?? "Failed to cancel trip." };
+      }
       const cur = dbRef.current;
       const trip = cur.trips.find((t) => t.id === id);
       if (!trip) return { ok: false, error: "Trip not found." };
@@ -461,7 +606,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       const wasDispatched = trip.status === "DISPATCHED";
       const updated: Trip = { ...trip, status: "CANCELLED", note: note ?? trip.note };
 
-      // Restore statuses only if the trip had reserved them (rule 8)
       const vehicles = wasDispatched
         ? cur.vehicles.map((v) =>
             v.id === trip.vehicleId && v.status === "ON_TRIP" ? { ...v, status: "AVAILABLE" as const } : v,
@@ -480,7 +624,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteTrip = useCallback<StoreValue["deleteTrip"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("deleteTrip", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true };
+        }
+        return { ok: false, error: json.error ?? "Failed to delete trip." };
+      }
       const cur = dbRef.current;
       const trip = cur.trips.find((t) => t.id === id);
       if (!trip) return { ok: false, error: "Trip not found." };
@@ -495,7 +647,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Maintenance --------------------
   const addMaintenance = useCallback<StoreValue["addMaintenance"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("addMaintenance", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as MaintenanceLog };
+        }
+        return { ok: false, error: json.error ?? "Failed to add maintenance." };
+      }
       const cur = dbRef.current;
       const vehicle = cur.vehicles.find((v) => v.id === input.vehicleId);
       if (!vehicle) return { ok: false, error: "Select a vehicle for the maintenance log." };
@@ -507,7 +667,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }
       const log: MaintenanceLog = { ...input, id: uid("mnt"), createdAt: new Date().toISOString() };
 
-      // Active maintenance sends the vehicle to the shop (rule 9)
       const vehicles =
         input.status === "ACTIVE"
           ? cur.vehicles.map((v) => (v.id === vehicle.id ? { ...v, status: "IN_SHOP" as const } : v))
@@ -520,7 +679,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const completeMaintenance = useCallback<StoreValue["completeMaintenance"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("completeMaintenance", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as MaintenanceLog };
+        }
+        return { ok: false, error: json.error ?? "Failed to complete maintenance." };
+      }
       const cur = dbRef.current;
       const log = cur.maintenance.find((m) => m.id === id);
       if (!log) return { ok: false, error: "Maintenance log not found." };
@@ -528,7 +695,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       const updated: MaintenanceLog = { ...log, status: "COMPLETED" };
 
-      // Restore the vehicle unless it is still needed elsewhere (rule 10)
       const stillActive = cur.maintenance.some(
         (m) => m.id !== id && m.vehicleId === log.vehicleId && m.status === "ACTIVE",
       );
@@ -546,11 +712,18 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteMaintenance = useCallback<StoreValue["deleteMaintenance"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("deleteMaintenance", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true };
+        }
+        return { ok: false, error: json.error ?? "Failed to delete maintenance." };
+      }
       const cur = dbRef.current;
       const log = cur.maintenance.find((m) => m.id === id);
       if (!log) return { ok: false, error: "Maintenance log not found." };
-      // If it was the reason the vehicle was in the shop, release it.
       const stillActive = cur.maintenance.some(
         (m) => m.id !== id && m.vehicleId === log.vehicleId && m.status === "ACTIVE",
       );
@@ -568,7 +741,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Expenses --------------------
   const addExpense = useCallback<StoreValue["addExpense"]>(
-    (input) => {
+    async (input) => {
+      if (isApiMode) {
+        const json = await apiPost("addExpense", input);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Expense };
+        }
+        return { ok: false, error: json.error ?? "Failed to add expense." };
+      }
       const cur = dbRef.current;
       if (input.amount <= 0) return { ok: false, error: "Amount must be greater than zero." };
       const expense: Expense = { ...input, id: uid("exp"), createdAt: new Date().toISOString() };
@@ -579,7 +760,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
 
   const deleteExpense = useCallback<StoreValue["deleteExpense"]>(
-    (id) => {
+    async (id) => {
+      if (isApiMode) {
+        const json = await apiPost("deleteExpense", id);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true };
+        }
+        return { ok: false, error: json.error ?? "Failed to delete expense." };
+      }
       const cur = dbRef.current;
       if (!cur.expenses.some((e) => e.id === id)) return { ok: false, error: "Expense not found." };
       commit({ ...cur, expenses: cur.expenses.filter((e) => e.id !== id) });
@@ -590,7 +779,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // -------------------- Settings / demo --------------------
   const updateSettings = useCallback<StoreValue["updateSettings"]>(
-    (patch) => {
+    async (patch) => {
+      if (isApiMode) {
+        const json = await apiPost("updateSettings", patch);
+        if (json.ok) {
+          if (json.db) setDb(json.db);
+          return { ok: true, data: json.data as Settings };
+        }
+        return { ok: false, error: json.error ?? "Failed to update settings." };
+      }
       const cur = dbRef.current;
       const settings = { ...cur.settings, ...patch };
       commit({ ...cur, settings });
@@ -599,7 +796,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [commit],
   );
 
-  const resetDemoData = useCallback(() => {
+  const resetDemoData = useCallback(async () => {
+    if (isApiMode) {
+      const json = await apiPost("resetDemoData");
+      if (json.ok && json.db) {
+        setDb(json.db);
+        dbRef.current = json.db;
+      }
+      return;
+    }
     commit(buildSeedDatabase());
   }, [commit]);
 
@@ -617,6 +822,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value: StoreValue = {
     db,
+    loading,
     registerUser,
     addVehicle,
     updateVehicle,

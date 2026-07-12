@@ -28,13 +28,13 @@ export function Register() {
 
   if (user) return <Navigate to={landingPath(user.role)} replace />;
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
       setError("Passwords do not match.");
       return;
     }
-    const res = register({ name, email, password, role });
+    const res = await register({ name, email, password, role });
     if (!res.ok) {
       setError(res.error);
       return;
