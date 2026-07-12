@@ -35,7 +35,7 @@ export function KpiCard({
 }: KpiCardProps) {
   const a = ACCENT[accent];
   return (
-    <div className="glass group relative overflow-hidden rounded-xl p-4">
+    <div className="glass group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20">
       <div className="relative">
         <div className="mb-2 flex items-start justify-between">
           <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">

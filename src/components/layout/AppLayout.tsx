@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { Icon } from "@/components/ui/Icon";
@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 export function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="min-h-screen">
@@ -52,7 +53,7 @@ export function AppLayout() {
         <Topbar onMenuClick={() => setDrawerOpen(true)} />
 
         <main className="relative z-10 flex-1 p-4 md:p-6 lg:p-8">
-          <div className="mx-auto max-w-7xl space-y-6">
+          <div key={location.pathname} className="animate-page mx-auto max-w-7xl space-y-6">
             <Outlet />
           </div>
         </main>

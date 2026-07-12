@@ -64,7 +64,7 @@ export function Card({
   ...props
 }: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("glass rounded-xl", className)} {...props}>
+    <div className={cn("glass rounded-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20", className)} {...props}>
       {children}
     </div>
   );
@@ -210,5 +210,47 @@ export function Spinner({ className }: { className?: string }) {
         className,
       )}
     />
+  );
+}
+
+// ---------------- Skeleton ----------------
+export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("animate-shimmer rounded-md", className)} {...props} />;
+}
+
+export function DashboardSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="glass flex flex-col gap-4 rounded-xl p-5 md:flex-row md:items-center md:justify-between md:p-6">
+        <div className="flex items-start gap-3">
+          <Skeleton className="mt-0.5 h-10 w-10 shrink-0 rounded-lg" />
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-5 w-32" />
+          </div>
+        </div>
+        <Skeleton className="h-10 w-24 rounded-lg" />
+      </div>
+      
+      {/* 4 Cards */}
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="glass rounded-xl p-4">
+            <div className="mb-4 flex items-center justify-between">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-6 w-6 rounded-full" />
+            </div>
+            <Skeleton className="h-8 w-16" />
+          </div>
+        ))}
+      </div>
+
+      {/* 2 Big Blocks */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Skeleton className="glass h-64 w-full rounded-xl" />
+        <Skeleton className="glass h-64 w-full rounded-xl" />
+      </div>
+    </div>
   );
 }

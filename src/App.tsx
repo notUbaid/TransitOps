@@ -7,7 +7,7 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { RequireAuth, RequireModule } from "@/components/layout/guards";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Spinner } from "@/components/ui/primitives";
+import { Spinner, DashboardSkeleton } from "@/components/ui/primitives";
 import type { ModuleKey } from "@/lib/rbac";
 
 import { Login } from "@/pages/Login";
@@ -36,8 +36,8 @@ const MODULE_ROUTES: { path: string; module: ModuleKey; Component: ComponentType
 
 function PageLoader() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center text-primary">
-      <Spinner className="h-6 w-6" />
+    <div className="animate-fade-in">
+      <DashboardSkeleton />
     </div>
   );
 }
