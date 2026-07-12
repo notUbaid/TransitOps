@@ -6,69 +6,69 @@
    ============================================================ */
 @theme {
   /* Surfaces */
-  --color-surface: #10131a;
-  --color-surface-dim: #10131a;
-  --color-surface-bright: #363941;
-  --color-surface-container-lowest: #0b0e15;
-  --color-surface-container-low: #191b23;
-  --color-surface-container: #1d2027;
-  --color-surface-container-high: #272a31;
-  --color-surface-container-highest: #32353c;
-  --color-surface-variant: #32353c;
-  --color-background: #10131a;
+  --color-surface: #09090b;
+  --color-surface-dim: #09090b;
+  --color-surface-bright: #27272a;
+  --color-surface-container-lowest: #000000;
+  --color-surface-container-low: #09090b;
+  --color-surface-container: #18181b; /* zinc-900 */
+  --color-surface-container-high: #27272a; /* zinc-800 */
+  --color-surface-container-highest: #3f3f46; /* zinc-700 */
+  --color-surface-variant: #27272a;
+  --color-background: #09090b;
 
   /* On-surface text */
-  --color-on-surface: #e1e2ec;
-  --color-on-surface-variant: #c2c6d6;
-  --color-on-background: #e1e2ec;
-  --color-inverse-surface: #e1e2ec;
-  --color-inverse-on-surface: #2e3038;
+  --color-on-surface: #fafafa;
+  --color-on-surface-variant: #a1a1aa;
+  --color-on-background: #fafafa;
+  --color-inverse-surface: #fafafa;
+  --color-inverse-on-surface: #09090b;
 
   /* Outlines */
-  --color-outline: #8c909f;
-  --color-outline-variant: #424754;
+  --color-outline: #52525b; /* zinc-600 */
+  --color-outline-variant: #27272a; /* zinc-800 */
 
-  /* Primary (blue) */
-  --color-primary: #adc6ff;
-  --color-on-primary: #002e6a;
-  --color-primary-container: #4d8eff;
-  --color-on-primary-container: #00285d;
-  --color-inverse-primary: #005ac2;
-  --color-surface-tint: #adc6ff;
-  --color-primary-fixed: #d8e2ff;
-  --color-primary-fixed-dim: #adc6ff;
-  --color-on-primary-fixed: #001a42;
-  --color-on-primary-fixed-variant: #004395;
+  /* Primary (Sleek Blue / White) */
+  --color-primary: #3b82f6; /* blue-500 */
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1d4ed8;
+  --color-on-primary-container: #eff6ff;
+  --color-inverse-primary: #3b82f6;
+  --color-surface-tint: #3b82f6;
+  --color-primary-fixed: #bfdbfe;
+  --color-primary-fixed-dim: #93c5fd;
+  --color-on-primary-fixed: #1e3a8a;
+  --color-on-primary-fixed-variant: #1d4ed8;
 
-  /* Secondary (steel) */
-  --color-secondary: #b7c8e1;
-  --color-on-secondary: #213145;
-  --color-secondary-container: #3a4a5f;
-  --color-on-secondary-container: #a9bad3;
-  --color-secondary-fixed: #d3e4fe;
-  --color-secondary-fixed-dim: #b7c8e1;
-  --color-on-secondary-fixed: #0b1c30;
-  --color-on-secondary-fixed-variant: #38485d;
+  /* Secondary (Neutral) */
+  --color-secondary: #e4e4e7;
+  --color-on-secondary: #18181b;
+  --color-secondary-container: #27272a;
+  --color-on-secondary-container: #fafafa;
+  --color-secondary-fixed: #f4f4f5;
+  --color-secondary-fixed-dim: #e4e4e7;
+  --color-on-secondary-fixed: #09090b;
+  --color-on-secondary-fixed-variant: #27272a;
 
-  /* Tertiary (amber) */
-  --color-tertiary: #ffb786;
-  --color-on-tertiary: #502400;
-  --color-tertiary-container: #df7412;
-  --color-on-tertiary-container: #461f00;
-  --color-tertiary-fixed: #ffdcc6;
-  --color-tertiary-fixed-dim: #ffb786;
-  --color-on-tertiary-fixed: #311400;
-  --color-on-tertiary-fixed-variant: #723600;
+  /* Tertiary (Accent - Indigo/Violet) */
+  --color-tertiary: #8b5cf6;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #5b21b6;
+  --color-on-tertiary-container: #f5f3ff;
+  --color-tertiary-fixed: #ddd6fe;
+  --color-tertiary-fixed-dim: #c4b5fd;
+  --color-on-tertiary-fixed: #2e1065;
+  --color-on-tertiary-fixed-variant: #4c1d95;
 
-  /* Error (red) */
-  --color-error: #ffb4ab;
-  --color-on-error: #690005;
-  --color-error-container: #93000a;
-  --color-on-error-container: #ffdad6;
+  /* Error (Red) */
+  --color-error: #ef4444;
+  --color-on-error: #ffffff;
+  --color-error-container: #7f1d1d;
+  --color-on-error-container: #fef2f2;
 
   /* Semantic aliases */
-  --color-success: #6ee7b7;
-  --color-warning: #fbbf24;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
 
   /* Font families */
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -162,16 +162,14 @@
 @layer components {
   /* Glassmorphism surfaces */
   .glass {
-    background-color: color-mix(in srgb, var(--color-surface-container) 78%, transparent);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background-color: var(--color-surface-container);
+    border: 1px solid var(--color-outline-variant);
   }
 
   .glass-strong {
     background-color: var(--color-surface-container);
-    border: 1px solid rgba(173, 198, 255, 0.25);
-    box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--color-outline-variant);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 
   /* Dark filled input with focus glow */
@@ -192,7 +190,7 @@
   .input-field:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 1px var(--color-primary), 0 0 12px rgba(173, 198, 255, 0.18);
+    box-shadow: 0 0 0 1px var(--color-primary);
   }
   .input-field:disabled {
     opacity: 0.55;

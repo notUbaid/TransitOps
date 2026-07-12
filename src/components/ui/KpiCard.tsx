@@ -36,7 +36,6 @@ export function KpiCard({
   const a = ACCENT[accent];
   return (
     <div className="glass group relative overflow-hidden rounded-xl p-4">
-      <div className={cn("absolute -right-6 -top-6 h-24 w-24 rounded-full blur-2xl transition-all duration-500", a.glow)} />
       <div className="relative">
         <div className="mb-2 flex items-start justify-between">
           <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -64,7 +63,7 @@ export function KpiCard({
         {progress != null && (
           <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-variant">
             <div
-              className="h-full rounded-full bg-secondary shadow-[0_0_8px_var(--color-secondary)]"
+              className="h-full rounded-full bg-secondary"
               style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
             />
           </div>

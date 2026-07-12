@@ -34,7 +34,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               cn(
                 "flex items-center gap-3 rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-200",
                 isActive
-                  ? "bg-primary-container font-bold text-on-primary-container shadow-[0_4px_20px_rgba(77,142,255,0.15)]"
+                  ? "bg-primary-container font-bold text-on-primary-container"
                   : "text-on-surface-variant hover:bg-white/5 hover:text-on-surface",
               )
             }
