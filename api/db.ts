@@ -62,7 +62,7 @@ async function insert(sql: any, table: string, record: Record<string, unknown>) 
   const values = Object.values(snaked);
   const cols = keys.join(', ');
   const placeholders = keys.map((_, i) => '$' + (i + 1)).join(', ');
-  return sql(`INSERT INTO ${table} (${cols}) VALUES (${placeholders})`, values);
+  return sql.query(`INSERT INTO ${table} (${cols}) VALUES (${placeholders})`, values);
 }
 
 // ---- Full DB fetch ----
