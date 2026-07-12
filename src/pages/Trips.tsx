@@ -87,9 +87,9 @@ export function Trips() {
     );
   }, [db.trips, search, statusFilter]);
 
-  const submitTrip = (intent: "draft" | "dispatch") => {
+  const submitTrip = async (intent: "draft" | "dispatch") => {
     if (editingId) {
-      const res = updateTrip(editingId, {
+      const res = await updateTrip(editingId, {
         source: form.source,
         destination: form.destination,
         vehicleId: form.vehicleId || null,
@@ -109,7 +109,7 @@ export function Trips() {
         toast.error(res.error);
       }
     } else {
-      const res = createTrip({
+      const res = await createTrip({
         source: form.source,
         destination: form.destination,
         vehicleId: form.vehicleId || null,
@@ -147,8 +147,8 @@ export function Trips() {
     setForm(emptyForm);
   };
 
-  const onDispatchExisting = (id: string) => {
-    const res = dispatchTrip(id);
+  const onDispatchExisting = async (id: string) => {
+    const res = await dispatchTrip(id);
     if (res.ok) toast.success(`Trip ${res.data!.code} dispatched.`);
     else toast.error(res.error);
   };
@@ -159,9 +159,9 @@ export function Trips() {
     setEndOdometer((trip.startOdometer ?? v?.odometer ?? 0) + trip.plannedKm);
     setFuelLiters(Math.round(trip.plannedKm / 8));
   };
-  const submitComplete = () => {
+  const submitComplete = async () => {
     if (!completing) return;
-    const res = completeTrip(completing.id, { endOdometer, fuelLiters });
+    const res = await completeTrip(completing.id, { endOdometer, fuelLiters });
     if (res.ok) {
       toast.success(`Trip ${completing.code} completed.`);
       setCompleting(null);
@@ -170,15 +170,15 @@ export function Trips() {
     }
   };
 
-  const onCancel = () => {
+  const onCancel = async () => {
     if (!cancelId) return;
-    const res = cancelTrip(cancelId);
+    const res = await cancelTrip(cancelId);
     if (res.ok) toast.success("Trip cancelled.");
     else toast.error(res.error);
   };
-  const onDelete = () => {
+  const onDelete = async () => {
     if (!deleteId) return;
-    const res = deleteTrip(deleteId);
+    const res = await deleteTrip(deleteId);
     if (res.ok) toast.success("Trip deleted.");
     else toast.error(res.error);
   };

@@ -18,7 +18,7 @@ interface AuthValue {
   isAuthenticated: boolean;
   role: Role | null;
   login: (email: string, password: string) => ActionResult<User>;
-  register: (input: RegisterInput) => ActionResult<User>;
+  register: (input: RegisterInput) => Promise<ActionResult<User>>;
   logout: () => void;
   access: (module: ModuleKey) => Access;
   canView: (module: ModuleKey) => boolean;
@@ -66,8 +66,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const register = useCallback<AuthValue["register"]>(
-    (input) => {
-      const res = registerUser(input);
+    async (input) => {
+      const res = await registerUser(input);
       if (res.ok && res.data) setUserId(res.data.id);
       return res;
     },
