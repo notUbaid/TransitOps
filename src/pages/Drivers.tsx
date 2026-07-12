@@ -48,7 +48,7 @@ const emptyForm: FormState = {
 };
 
 function scoreColor(score: number) {
-  if (score >= 85) return "text-emerald-300";
+  if (score >= 85) return "text-emerald-600";
   if (score >= 70) return "text-tertiary";
   return "text-error";
 }
@@ -191,10 +191,10 @@ export function Drivers() {
             className: "text-right",
             cell: (d: Driver) => (
               <div className="flex items-center justify-end gap-1">
-                <button onClick={(e) => { e.stopPropagation(); openEdit(d); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" aria-label="Edit">
+                <button onClick={(e) => { e.stopPropagation(); openEdit(d); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-primary" aria-label="Edit">
                   <Icon name="edit" size={18} />
                 </button>
-                <button onClick={(e) => { e.stopPropagation(); setDeleteId(d.id); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" aria-label="Delete">
+                <button onClick={(e) => { e.stopPropagation(); setDeleteId(d.id); }} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error" aria-label="Delete">
                   <Icon name="delete" size={18} />
                 </button>
               </div>
@@ -227,7 +227,7 @@ export function Drivers() {
       {!editable && <ReadOnlyNotice />}
 
       <Card>
-        <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Icon name="search" size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
             <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, license…" className="pl-10" />
@@ -257,7 +257,7 @@ export function Drivers() {
             />
           }
         />
-        <div className="border-t border-white/10 px-4 py-2.5 font-label-sm text-label-sm text-on-surface-variant">
+        <div className="border-t border-outline-variant px-4 py-2.5 font-label-sm text-label-sm text-on-surface-variant">
           {rows.length} of {db.drivers.length} drivers
         </div>
       </Card>

@@ -46,7 +46,7 @@ export function Settings() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* General settings */}
         <Card className="p-5 lg:p-6">
-          <div className="mb-4 flex items-center gap-2 border-b border-white/10 pb-3">
+          <div className="mb-4 flex items-center gap-2 border-b border-outline-variant pb-3">
             <Icon name="tune" className="text-primary" size={20} />
             <h3 className="text-headline-md font-semibold text-on-surface">General</h3>
           </div>
@@ -76,7 +76,7 @@ export function Settings() {
                       "flex-1 rounded-lg border px-3 py-2 font-label-md text-label-md transition-colors disabled:opacity-60",
                       form.distanceUnit === u
                         ? "border-primary bg-primary/10 text-primary"
-                        : "border-white/10 text-on-surface-variant hover:text-on-surface",
+                        : "border-outline-variant text-on-surface-variant hover:text-on-surface",
                     )}
                   >
                     {u === "km" ? "Kilometers" : "Miles"}
@@ -113,7 +113,7 @@ export function Settings() {
 
         {/* RBAC matrix */}
         <Card className="p-5 lg:col-span-2 lg:p-6">
-          <div className="mb-3 flex items-center gap-2 border-b border-white/10 pb-3">
+          <div className="mb-3 flex items-center gap-2 border-b border-outline-variant pb-3">
             <Icon name="shield_person" className="text-tertiary" size={20} />
             <h3 className="text-headline-md font-semibold text-on-surface">Role-Based Access Control</h3>
           </div>
@@ -123,7 +123,7 @@ export function Settings() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-left">
               <thead>
-                <tr className="bg-surface-container-high/50 font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
+                <tr className="bg-surface-container-low font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
                   <th className="rounded-l-lg px-3 py-3 font-medium">Role</th>
                   {RBAC_MATRIX_COLUMNS.map((c, i) => (
                     <th key={c.key} className={cn("px-3 py-3 text-center font-medium", i === RBAC_MATRIX_COLUMNS.length - 1 && "rounded-r-lg")}>
@@ -132,7 +132,7 @@ export function Settings() {
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-outline-variant/50">
                 {ROLES.map((role) => (
                   <tr key={role} className="transition-colors hover:bg-primary/5">
                     <td className="px-3 py-3">
@@ -147,11 +147,11 @@ export function Settings() {
                       return (
                         <td key={c.key} className="px-3 py-3 text-center">
                           {a === "full" ? (
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary/20 text-primary">
+                            <span className="inline-flex h-6 w-6 items-center justify-center rounded bg-primary/10 text-primary">
                               <Icon name="check" size={16} />
                             </span>
                           ) : a === "read" ? (
-                            <span className="rounded bg-secondary-container/40 px-2 py-0.5 font-label-sm text-label-sm text-secondary">View</span>
+                            <span className="rounded bg-secondary-container px-2 py-0.5 font-label-sm text-label-sm text-on-secondary-container">View</span>
                           ) : (
                             <span className="text-on-surface-variant/40">—</span>
                           )}

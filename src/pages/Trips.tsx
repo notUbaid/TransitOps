@@ -233,26 +233,26 @@ export function Trips() {
               <div className="flex items-center justify-end gap-1">
                 {t.status === "DRAFT" && (
                   <>
-                    <button onClick={() => onEditDraft(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Edit" aria-label="Edit draft">
+                    <button onClick={() => onEditDraft(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-primary" title="Edit" aria-label="Edit draft">
                       <Icon name="edit" size={18} />
                     </button>
-                    <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-primary" title="Dispatch" aria-label="Dispatch trip">
+                    <button onClick={() => onDispatchExisting(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-primary" title="Dispatch" aria-label="Dispatch trip">
                       <Icon name="send" size={18} />
                     </button>
                   </>
                 )}
                 {t.status === "DISPATCHED" && (
-                  <button onClick={() => openComplete(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-emerald-300" title="Complete" aria-label="Complete trip">
+                  <button onClick={() => openComplete(t)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-emerald-600" title="Complete" aria-label="Complete trip">
                     <Icon name="check_circle" size={18} />
                   </button>
                 )}
                 {(t.status === "DRAFT" || t.status === "DISPATCHED") && (
-                  <button onClick={() => setCancelId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Cancel" aria-label="Cancel trip">
+                  <button onClick={() => setCancelId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error" title="Cancel" aria-label="Cancel trip">
                     <Icon name="block" size={18} />
                   </button>
                 )}
                 {t.status !== "DISPATCHED" && (
-                  <button onClick={() => setDeleteId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Delete" aria-label="Delete trip">
+                  <button onClick={() => setDeleteId(t.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error" title="Delete" aria-label="Delete trip">
                     <Icon name="delete" size={18} />
                   </button>
                 )}
@@ -282,7 +282,7 @@ export function Trips() {
         {/* Create Trip */}
         {editable && (
           <Card className="p-5 lg:col-span-7 lg:p-6">
-            <h3 className="mb-5 border-b border-white/10 pb-4 text-headline-md font-semibold text-on-surface">
+            <h3 className="mb-5 border-b border-outline-variant pb-4 text-headline-md font-semibold text-on-surface">
               Create Trip
             </h3>
             <form
@@ -343,7 +343,7 @@ export function Trips() {
 
               {/* Live capacity validation */}
               {capacityExceeded && selectedVehicle && (
-                <div className="flex items-start gap-3 rounded-lg border border-error/50 bg-error/10 p-4">
+                <div className="flex items-start gap-3 rounded-lg border border-error/30 bg-error/5 p-4">
                   <Icon name="error" size={20} className="mt-0.5 text-error" />
                   <div>
                     <p className="font-label-md text-label-md font-bold text-error">
@@ -357,15 +357,15 @@ export function Trips() {
                 </div>
               )}
               {selectedVehicle && !capacityExceeded && form.cargoKg > 0 && (
-                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2.5">
-                  <Icon name="check_circle" size={18} className="text-emerald-300" />
+                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-50 px-4 py-2.5">
+                  <Icon name="check_circle" size={18} className="text-emerald-600" />
                   <p className="text-body-md text-on-surface-variant">
                     {formatNumber(selectedVehicle.capacityKg - form.cargoKg)} kg of spare capacity — cleared for dispatch.
                   </p>
                 </div>
               )}
 
-              <div className="flex flex-col-reverse gap-2 border-t border-white/10 pt-4 sm:flex-row sm:justify-end">
+              <div className="flex flex-col-reverse gap-2 border-t border-outline-variant pt-4 sm:flex-row sm:justify-end">
                 {editingId && (
                   <Button type="button" variant="outline" onClick={onCancelEdit}>
                     Cancel Edit
@@ -386,7 +386,7 @@ export function Trips() {
         <div className={cn("space-y-3", editable ? "lg:col-span-5" : "lg:col-span-12")}>
           <div className="flex items-center justify-between px-1">
             <h3 className="text-headline-md font-semibold text-on-surface">Live Board</h3>
-            <span className="rounded bg-primary/20 px-2 py-1 font-label-sm text-label-sm font-bold tracking-wider text-primary">
+            <span className="rounded bg-primary/10 px-2 py-1 font-label-sm text-label-sm font-bold tracking-wider text-primary">
               {activeCount} ACTIVE
             </span>
           </div>
@@ -401,7 +401,7 @@ export function Trips() {
                 const v = vehicleById(t.vehicleId);
                 const d = driverById(t.driverId);
                 return (
-                  <div key={t.id} className="glass group relative overflow-hidden rounded-xl p-5">
+                  <div key={t.id} className="group relative overflow-hidden rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
                     <div className={cn("absolute left-0 top-0 h-full w-1", style.dot)} />
                     <div className="mb-3 flex items-start justify-between gap-2">
                       <div>
@@ -422,8 +422,8 @@ export function Trips() {
                       <span>{formatNumber(t.plannedKm)} km</span>
                     </div>
 
-                    {editable && (
-                      <div className="mt-4 flex gap-2 border-t border-white/10 pt-3">
+                      {editable && (
+                      <div className="mt-4 flex gap-2 border-t border-outline-variant pt-3">
                         {t.status === "DRAFT" ? (
                           <>
                             <Button size="sm" icon="send" className="flex-1" onClick={() => onDispatchExisting(t.id)}>
@@ -455,7 +455,7 @@ export function Trips() {
 
       {/* All trips table */}
       <Card>
-        <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-headline-md font-semibold text-on-surface">All Trips</h3>
           <div className="flex flex-wrap gap-2">
             <div className="relative">
@@ -502,7 +502,7 @@ export function Trips() {
         <div className="space-y-4">
           <p className="text-body-md text-on-surface-variant">
             Enter the final odometer reading and fuel consumed. The vehicle and driver will be released back to
-            <span className="text-emerald-300"> Available</span>.
+                <span className="text-emerald-600"> Available</span>.
           </p>
           <Field label="Final Odometer (km)">
             <Input type="number" value={endOdometer} onChange={(e) => setEndOdometer(Number(e.target.value))} />

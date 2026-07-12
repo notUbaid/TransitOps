@@ -151,7 +151,7 @@ export function Expenses() {
             headerClassName: "w-0",
             className: "text-right",
             cell: (e: Expense) => (
-              <button onClick={() => setDeleteId(e.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-white/5 hover:text-error" title="Delete">
+              <button onClick={() => setDeleteId(e.id)} className="rounded-md p-1.5 text-on-surface-variant hover:bg-black/5 hover:text-error" title="Delete">
                 <Icon name="delete" size={18} />
               </button>
             ),
@@ -191,7 +191,7 @@ export function Expenses() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <div className="flex flex-col gap-3 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 border-b border-outline-variant p-4 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-headline-md font-semibold text-on-surface">Expense Log</h3>
             <div className="flex flex-wrap gap-2">
               <div className="relative">
@@ -219,7 +219,7 @@ export function Expenses() {
 
         {/* Operational cost per vehicle */}
         <Card className="flex flex-col">
-          <div className="border-b border-white/10 p-4">
+          <div className="border-b border-outline-variant p-4">
             <h3 className="text-headline-md font-semibold text-on-surface">Cost by Vehicle</h3>
             <p className="font-label-sm text-label-sm text-on-surface-variant">Fuel + Maintenance</p>
           </div>
@@ -243,7 +243,7 @@ export function Expenses() {
                     </div>
                   );
                 })}
-                <div className="flex items-center gap-4 border-t border-white/10 pt-3 font-label-sm text-label-sm text-on-surface-variant">
+                <div className="flex items-center gap-4 border-t border-outline-variant pt-3 font-label-sm text-label-sm text-on-surface-variant">
                   <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-primary" /> Fuel</span>
                   <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-tertiary-container" /> Maintenance</span>
                 </div>

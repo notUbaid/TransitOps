@@ -5,10 +5,10 @@ import { Icon } from "./Icon";
 type Accent = "primary" | "secondary" | "tertiary" | "emerald" | "error";
 
 const ACCENT: Record<Accent, { icon: string; glow: string }> = {
-  primary: { icon: "text-primary", glow: "bg-primary/10 group-hover:bg-primary/20" },
-  secondary: { icon: "text-secondary", glow: "bg-secondary/10 group-hover:bg-secondary/20" },
-  tertiary: { icon: "text-tertiary", glow: "bg-tertiary-container/15 group-hover:bg-tertiary-container/25" },
-  emerald: { icon: "text-emerald-300", glow: "bg-emerald-500/10 group-hover:bg-emerald-500/20" },
+  primary: { icon: "text-primary", glow: "bg-primary/10 group-hover:bg-primary/15" },
+  secondary: { icon: "text-secondary", glow: "bg-secondary/20 group-hover:bg-secondary/30" },
+  tertiary: { icon: "text-tertiary", glow: "bg-tertiary/10 group-hover:bg-tertiary/15" },
+  emerald: { icon: "text-emerald-600", glow: "bg-emerald-500/10 group-hover:bg-emerald-500/20" },
   error: { icon: "text-error", glow: "bg-error/10 group-hover:bg-error/20" },
 };
 
@@ -35,7 +35,7 @@ export function KpiCard({
 }: KpiCardProps) {
   const a = ACCENT[accent];
   return (
-    <div className="glass group relative overflow-hidden rounded-xl p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-black/20">
+    <div className="group relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
       <div className="relative">
         <div className="mb-2 flex items-start justify-between">
           <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
@@ -52,7 +52,7 @@ export function KpiCard({
           <div
             className={cn(
               "mt-1 flex items-center gap-1 font-label-md text-label-md",
-              trend.positive ? "text-emerald-400" : "text-error",
+              trend.positive ? "text-emerald-600" : "text-error",
             )}
           >
             <Icon name={trend.direction === "up" ? "trending_up" : "trending_down"} size={16} />
@@ -61,9 +61,9 @@ export function KpiCard({
         )}
 
         {progress != null && (
-          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-surface-variant">
+          <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
             <div
-              className="h-full rounded-full bg-secondary"
+              className="h-full rounded-full bg-primary"
               style={{ width: `${Math.max(0, Math.min(100, progress))}%` }}
             />
           </div>

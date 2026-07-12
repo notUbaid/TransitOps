@@ -59,12 +59,12 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   };
 
   return (
-    <header className="glass sticky top-0 z-40 flex h-16 items-center justify-between gap-3 border-b border-white/10 px-4 md:px-6">
+    <header className="sticky top-0 z-40 flex h-16 items-center justify-between gap-3 border-b border-outline-variant bg-white/90 px-4 backdrop-blur-md md:px-6">
       {/* Left */}
       <div className="flex flex-1 items-center gap-3">
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-on-surface md:hidden"
+          className="rounded-lg p-2 text-on-surface-variant transition-colors hover:bg-black/5 hover:text-on-surface md:hidden"
           aria-label="Open menu"
         >
           <Icon name="menu" size={22} />
@@ -84,17 +84,17 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             }}
             onFocus={() => setSearchOpen(true)}
             placeholder="Search vehicles, drivers, trips…"
-            className="w-full rounded-full border-none bg-surface-container-low py-2 pl-10 pr-4 text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-full rounded-full border border-outline bg-white py-2 pl-10 pr-4 text-body-md text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
           {searchOpen && results.length > 0 && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setSearchOpen(false)} />
-              <div className="glass-strong absolute left-0 right-0 top-12 z-20 overflow-hidden rounded-xl p-1.5">
+              <div className="absolute left-0 right-0 top-12 z-20 overflow-hidden rounded-xl bg-white p-1.5 shadow-lg ring-1 ring-black/5">
                 {results.map((r, i) => (
                   <button
                     key={i}
                     onClick={() => go(r.path)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-white/5"
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-black/5"
                   >
                     <Icon name={r.icon} size={18} className="text-on-surface-variant" />
                     <span className="flex-1">
@@ -113,7 +113,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       <div className="flex items-center gap-1 sm:gap-2">
         <button
           onClick={toggle}
-          className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-on-surface"
+          className="rounded-full p-2 text-on-surface-variant transition-colors hover:bg-black/5 hover:text-on-surface"
           aria-label="Toggle theme"
         >
           <Icon name={theme === "dark" ? "light_mode" : "dark_mode"} size={20} />
@@ -123,7 +123,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         <div className="relative">
           <button
             onClick={() => setAlertsOpen((o) => !o)}
-            className="relative rounded-full p-2 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-on-surface"
+            className="relative rounded-full p-2 text-on-surface-variant transition-colors hover:bg-black/5 hover:text-on-surface"
             aria-label="Alerts"
           >
             <Icon name="notifications" size={20} />
@@ -136,8 +136,8 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           {alertsOpen && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setAlertsOpen(false)} />
-              <div className="glass-strong absolute right-0 top-12 z-20 w-[min(90vw,340px)] overflow-hidden rounded-xl">
-                <div className="border-b border-white/10 px-4 py-3">
+              <div className="absolute right-0 top-12 z-20 w-[min(90vw,340px)] overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5">
+                <div className="border-b border-outline-variant px-4 py-3">
                   <p className="text-body-md font-semibold text-on-surface">Alerts</p>
                   <p className="font-label-sm text-label-sm text-on-surface-variant">
                     {alerts.length} item{alerts.length === 1 ? "" : "s"} need attention
@@ -148,7 +148,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
                     <p className="px-4 py-6 text-center text-body-md text-on-surface-variant">All clear ✨</p>
                   ) : (
                     alerts.map((a) => (
-                      <div key={a.id} className="flex items-start gap-3 border-b border-white/5 px-4 py-3 last:border-0">
+                      <div key={a.id} className="flex items-start gap-3 border-b border-outline-variant/50 px-4 py-3 last:border-0">
                         <Icon
                           name={a.icon}
                           size={18}

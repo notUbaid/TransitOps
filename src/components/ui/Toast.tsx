@@ -70,7 +70,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               role="status"
-              className="glass-strong animate-fade-in flex items-start gap-3 overflow-hidden rounded-xl p-3.5 pr-4 shadow-2xl"
+              className="animate-fade-in flex items-start gap-3 overflow-hidden rounded-2xl bg-white p-3.5 pr-4 shadow-lg ring-1 ring-black/5"
             >
               <span className={cn("mt-0.5 h-full w-1 shrink-0 self-stretch rounded-full", meta.bar)} />
               <Icon name={meta.icon} className={cn("mt-0.5 shrink-0", meta.text)} size={20} />

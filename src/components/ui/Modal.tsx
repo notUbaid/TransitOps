@@ -48,7 +48,7 @@ export function Modal({
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto p-4 md:items-center">
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -61,7 +61,7 @@ export function Modal({
           SIZES[size],
         )}
       >
-        <div className="flex items-start gap-3 border-b border-white/10 p-5">
+        <div className="flex items-start gap-3 border-b border-outline-variant p-5">
           {icon && (
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Icon name={icon} size={22} />
@@ -75,7 +75,7 @@ export function Modal({
           </div>
           <button
             onClick={onClose}
-            className="shrink-0 rounded-full p-1 text-on-surface-variant transition-colors hover:bg-white/5 hover:text-on-surface"
+            className="shrink-0 rounded-full p-1 text-on-surface-variant transition-colors hover:bg-black/5 hover:text-on-surface"
             aria-label="Close"
           >
             <Icon name="close" size={20} />
@@ -85,7 +85,7 @@ export function Modal({
         <div className="max-h-[calc(100vh-14rem)] overflow-y-auto p-5">{children}</div>
 
         {footer && (
-          <div className="flex items-center justify-end gap-2 border-t border-white/10 p-4">
+          <div className="flex items-center justify-end gap-2 border-t border-outline-variant p-4">
             {footer}
           </div>
         )}
