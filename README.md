@@ -329,14 +329,46 @@ Reports Updated
 
 ---
 
-# 👨‍💻 Team
+## 👨‍💻 Team
 
-| Name | Role |
-|------|------|
-| Your Name | Full Stack Developer |
-| Member 2 | Backend Developer |
-| Member 3 | Frontend Developer |
-| Member 4 | UI/UX Designer |
+<p align="center">
+  <table>
+    <tr>
+      <td align="center" width="25%">
+        <div>
+          <img src="https://avatars.githubusercontent.com/Sam-bot-dev?s=120" width="120px;" height="120px;" alt="Bhavesh"/>
+        </div>
+        <div><strong>🧩 Head Teammate</strong></div>
+        <div><strong>Bhavesh</strong></div>
+        <a href="https://github.com/Sam-bot-dev">🌐 GitHub</a>
+      </td>
+      <td align="center" width="25%">
+        <div>
+          <img src="https://avatars.githubusercontent.com/notUbaid?s=120" width="120px;" height="120px;" alt="Ubaid khan"/>
+        </div>
+        <div><strong>⭐ Team Leader</strong></div>
+        <div><strong>Ubaid khan</strong></div>
+        <a href="https://github.com/notUbaid">🌐 GitHub</a>
+      </td>
+      <td align="center" width="25%">
+        <div>
+          <img src="https://avatars.githubusercontent.com/Destroyerved?s=120" width="120px;" height="120px;" alt="Rohan"/>
+        </div>
+        <div><strong>Architecture Designer</strong></div>
+        <div><strong>Ved</strong></div>
+        <a href="https://github.com/Destroyerved">🌐 GitHub</a>
+      </td>
+      <td align="center" width="25%">
+        <div>
+          <img src="https://avatars.githubusercontent.com/harsheellhu?s=120" width="120px;" height="120px;" alt="Yug"/>
+        </div>
+        <div><strong>🗄️ Database Head</strong></div>
+        <div><strong>Harshil</strong></div>
+        <a href="https://github.com/harsheellhu">🌐 GitHub</a>
+      </td>
+    </tr>
+  </table>
+</p>
 
 ---
 
