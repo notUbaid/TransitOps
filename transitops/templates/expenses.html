@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Fuel & Expenses · TransitOps{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Fuel &amp; Expense Management</h1>
+  <div class="head-actions">
+    <a class="btn" href="{{ url_for('expenses.export_csv') }}">Export CSV</a>
+  </div>
+</div>
+
+<div class="op-cost-banner">
+  Total Operational Cost (auto) = Fuel + Maintenance
+  <strong class="mono">{{ app_settings.get('currency', 'INR') }}
+    {{ totals.operational | inr }}</strong>
+  <span class="muted small">(fuel {{ totals.fuel | inr }} ·
+    maintenance {{ totals.maintenance | inr }} ·
+    tolls/misc tracked separately: {{ totals.tolls_misc | inr }})</span>
+</div>
+
+<div class="grid-2-1">
+  <section class="card">
+    <div class="row-between">
+      <h2 class="card-title">Fuel Logs</h2>
+      {% if can('fuel', 'full') %}
+      <button class="btn btn-sm btn-primary" type="button"
+              onclick="document.getElementById('fuel-form').toggleAttribute('hidden')">
+        + Log Fuel</button>
+      {% endif %}
+    </div>
+    {% if can('fuel', 'full') %}
+    <form id="fuel-form" hidden method="post" action="{{ url_for('expenses.add_fuel') }}"
+          class="form-grid form-inline-card">
+      <label>Vehicle
+        <select name="vehicle_id" required>
+          {% for v in vehicles %}<option value="{{ v.id }}">{{ v.name }}</option>{% endfor %}
+        </select></label>
+      <label>Trip (optional)
+        <select name="trip_id">
+          <option value="">—</option>
+          {% for t in trips %}<option value="{{ t.id }}">{{ t.code }}</option>{% endfor %}
+        </select></label>
+      <label>Date <input type="date" name="log_date" value="{{ today }}"></label>
+      <label>Liters <input type="number" name="liters" step="0.1" min="0.1" required></label>
+      <label>Cost <input type="number" name="cost" step="1" min="0" required></label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save Fuel Log</button>
+      </div>
+    </form>
+    {% endif %}
+    <table class="data-table sortable">
+      <thead><tr><th>Vehicle</th><th>Trip</th><th>Date</th>
+        <th data-num>Liters</th><th data-num>Fuel Cost</th></tr></thead>
+      <tbody>
+        {% for f in fuel_logs %}
+        <tr>
+          <td><strong>{{ f.vehicle_name }}</strong></td>
+          <td class="mono">{{ f.trip_code or '—' }}</td>
+          <td class="mono">{{ f.log_date }}</td>
+          <td class="mono">{{ f.liters | round(1) }} L</td>
+          <td class="mono">{{ f.cost | inr }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="muted">No fuel logs yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <div class="row-between">
+      <h2 class="card-title">Other Expenses (Toll / Misc)</h2>
+      {% if can('fuel', 'full') %}
+      <button class="btn btn-sm btn-primary" type="button"
+              onclick="document.getElementById('expense-form').toggleAttribute('hidden')">
+        + Add Expense</button>
+      {% endif %}
+    </div>
+    {% if can('fuel', 'full') %}
+    <form id="expense-form" hidden method="post" action="{{ url_for('expenses.add_expense') }}"
+          class="form-grid form-inline-card">
+      <label>Trip
+        <select name="trip_id">
+          <option value="">—</option>
+          {% for t in trips %}
+            <option value="{{ t.id }}">{{ t.code }} · {{ t.source }} → {{ t.destination }}</option>
+          {% endfor %}
+        </select></label>
+      <label>Date <input type="date" name="expense_date" value="{{ today }}"></label>
+      <label>Toll <input type="number" name="toll" step="1" min="0" value="0"></label>
+      <label>Misc <input type="number" name="misc" step="1" min="0" value="0"></label>
+      <label>Description <input name="description" placeholder="optional"></label>
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Save Expense</button>
+      </div>
+    </form>
+    {% endif %}
+    <table class="data-table sortable">
+      <thead><tr><th>Trip</th><th>Vehicle</th><th data-num>Toll</th>
+        <th data-num>Other</th><th data-num>Maint. (linked)</th>
+        <th data-num>Total</th></tr></thead>
+      <tbody>
+        {% for e in expenses %}
+        <tr>
+          <td class="mono">{{ e.trip_code or '—' }}</td>
+          <td>{{ e.vehicle_name or '—' }}</td>
+          <td class="mono">{{ e.toll | inr }}</td>
+          <td class="mono">{{ e.misc | inr }}</td>
+          <td class="mono">{{ e.maint_linked | inr }}</td>
+          <td class="mono"><strong>{{ e.total | inr }}</strong></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="muted">No expenses recorded yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endblock %}

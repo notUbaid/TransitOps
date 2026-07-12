@@ -1,383 +1,103 @@
-<div align="center">
+# TransitOps — Smart Transport Operations Platform
 
-# TransitOps
-### Smart Transport Operations Platform
+An end-to-end transport operations platform that digitizes vehicle, driver,
+dispatch, maintenance, and expense management while enforcing business rules
+and providing operational insights. Built for the 8-hour hackathon; screens
+follow the official Excalidraw wireframe (`docs/wireframe.excalidraw`).
 
-<p align="center">
-A modern fleet management platform that digitizes transport operations, vehicle lifecycle, driver management, maintenance, dispatching, and operational analytics.
-</p>
+## Quick start
 
-![License](https://img.shields.io/badge/License-MIT-blue)
-![Hackathon](https://img.shields.io/badge/Hackathon-Odoo%20Hackathon-orange)
-![Status](https://img.shields.io/badge/Status-Completed-success)
-![Made With](https://img.shields.io/badge/Built%20With-Full%20Stack-green)
-
-</div>
-
----
-
-# Overview
-
-TransitOps is an intelligent transport management platform designed to replace manual spreadsheets and logbooks with a centralized digital solution.
-
-The system enables organizations to efficiently manage their fleet by tracking vehicles, drivers, trips, maintenance schedules, fuel consumption, operational expenses, and fleet analytics from a single dashboard.
-
----
-
-# Problem Statement
-
-Many logistics companies still rely on spreadsheets and manual processes for managing transport operations. This often results in:
-
-- Vehicle scheduling conflicts
-- Driver assignment issues
-- Poor fleet utilization
-- Missed maintenance schedules
-- Expired driving licenses
-- Inaccurate fuel and expense tracking
-- Lack of operational insights
-
-TransitOps solves these problems through automation, validation rules, and real-time analytics.
-
----
-
-# Features
-
-## Authentication
-
-- Secure Login
-- Email Authentication
-- Role-Based Access Control (RBAC)
-
----
-
-## Fleet Management
-
-- Vehicle Registration
-- Vehicle Status Tracking
-- Vehicle Lifecycle Management
-- Vehicle Capacity Management
-- Odometer Tracking
-- Acquisition Cost Tracking
-
----
-
-## Driver Management
-
-- Driver Registration
-- License Validation
-- Safety Score
-- Driver Availability
-- Contact Information
-- Driver Status Tracking
-
----
-
-## Trip Management
-
-- Trip Creation
-- Vehicle Assignment
-- Driver Assignment
-- Cargo Weight Validation
-- Route Information
-- Trip Lifecycle
-
-```text
-Draft
-   ↓
-Dispatched
-   ↓
-Completed
-
-or
-
-Cancelled
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # Windows  (Linux/macOS: source .venv/bin/activate)
+pip install -r requirements.txt
+python run.py
 ```
 
----
+Open http://127.0.0.1:5000 — the SQLite database is created and seeded with
+demo data on first run.
 
-## Maintenance
+### Demo accounts (password for all: `transit123`)
 
-- Maintenance Logs
-- Automatic Vehicle Status Updates
-- Workshop Management
-- Maintenance History
+| Email | Role | Access |
+| --- | --- | --- |
+| `meera.f@transitops.in` | Fleet Manager | Fleet, Drivers, Maintenance, Analytics, Settings |
+| `raven.k@transitops.in` | Dispatcher | Dashboard, Trips (+ Fleet view) |
+| `sana.s@transitops.in` | Safety Officer | Drivers & compliance (+ Trips view) |
+| `farhan.a@transitops.in` | Financial Analyst | Fuel & Expenses, Analytics (+ Fleet/Maintenance view) |
 
----
+### Tests
 
-## Fuel & Expense Tracking
-
-- Fuel Logs
-- Fuel Cost
-- Maintenance Expenses
-- Toll Expenses
-- Operational Cost Calculation
-
----
-
-## Dashboard
-
-Real-time KPIs including:
-
-- Active Vehicles
-- Available Vehicles
-- Vehicles in Maintenance
-- Drivers on Duty
-- Active Trips
-- Pending Trips
-- Fleet Utilization
-- Operational Cost
-
----
-
-## Analytics
-
-- Fuel Efficiency
-- Fleet Utilization
-- Vehicle ROI
-- Expense Reports
-- Operational Insights
-- CSV Export
-
----
-
-# System Modules
-
-```text
-Authentication
-      │
-      ▼
-Dashboard
-      │
- ┌────┼────────────┐
- │    │            │
- ▼    ▼            ▼
-Vehicles Drivers  Trips
- │        │         │
- └────┬───┘         │
-      ▼             ▼
- Maintenance    Fuel Logs
-      │             │
-      └──────┬──────┘
-             ▼
-        Reports & Analytics
+```bash
+pytest
 ```
 
----
+Covers login lockout, RBAC, unique registration, every dispatch validation,
+automatic status transitions, and the maintenance workflow.
 
-# Business Rules
+## Feature checklist
 
-- Vehicle Registration Number must be unique.
-- Vehicles under maintenance cannot be dispatched.
-- Retired vehicles cannot be assigned.
-- Suspended drivers cannot drive.
-- Drivers with expired licenses cannot be assigned.
-- Vehicle capacity cannot be exceeded.
-- Vehicle already on trip cannot be assigned.
-- Driver already on trip cannot be assigned.
-- Dispatch automatically changes status to On Trip.
-- Completing a trip restores availability.
-- Closing maintenance restores vehicle status.
+**Mandatory deliverables**
+- [x] Responsive web interface (desktop → mobile sidebar collapse)
+- [x] Authentication with RBAC (per-role module access, enforced server-side)
+- [x] Account lockout after 5 failed login attempts
+- [x] CRUD for Vehicles and Drivers
+- [x] Trip management with validations (capacity, availability, license)
+- [x] Automatic status transitions (dispatch / complete / cancel / maintenance)
+- [x] Maintenance workflow (active → In Shop, close → Available)
+- [x] Fuel & expense tracking with auto operational cost (Fuel + Maintenance)
+- [x] Dashboard with KPIs and type/status/region filters
 
----
+**Bonus features**
+- [x] Charts and visual analytics (monthly revenue, costliest vehicles)
+- [x] CSV export (vehicles, drivers, trips, fuel/expenses, analytics)
+- [x] Email reminders for expiring licenses (mock mailer, 30-day horizon)
+- [x] Search, filters, and sorting (topbar quick-search + sortable columns)
+- [x] Dark mode (persisted per browser)
 
-# Database Design
+## Business rules enforced
 
-```text
-Users
-│
-├── Roles
+All ten mandatory rules from the problem statement are enforced in
+`transitops/services/rules.py` and the trip/maintenance routes — see
+`docs/PROBLEM_STATEMENT.md` §4 for the list. The UI mirrors the checks
+(e.g. live "Capacity exceeded by N kg — dispatch blocked" on the trip form),
+but the server is always the authority.
 
-Vehicles
-│
-├── Trips
-├── Fuel Logs
-├── Maintenance Logs
-└── Expenses
+## Architecture
 
-Drivers
-│
-└── Trips
+```
+run.py                     entry point (auto-seeds on first run)
+transitops/
+  __init__.py              app factory, Jinja filters (Indian number format)
+  auth.py                  login/logout + lockout
+  rbac.py                  role → module permission matrix + @require decorator
+  db.py / schema.sql       SQLite layer
+  seed.py                  demo data matching the wireframe
+  services/
+    rules.py               the 10 mandatory business rules
+    stats.py               KPIs, fuel efficiency, utilization, ROI
+    reminders.py           license expiry reminders (mock mailer)
+  routes/                  one blueprint per module (8 screens)
+  templates/ static/       Jinja templates + CSS/JS (no build step, no CDN)
+tests/                     pytest suite for auth + business rules
+docs/                      problem statement, wireframe, original PDF
+scripts/                   git history tooling (see below)
 ```
 
----
+Stack: **Python / Flask / SQLite / vanilla JS** — no build step, no external
+CDNs, runs fully offline.
 
-# Dashboard Metrics
+## Team & git history
 
-- Fleet Utilization
-- Active Trips
-- Pending Trips
-- Available Vehicles
-- Vehicles in Shop
-- Driver Availability
-- Operational Cost
-- Fuel Consumption
-- Vehicle ROI
-- Fuel Efficiency
+Team members are defined in `scripts/team.env`. To (re)build the repo history
+with real names/emails — commits are distributed evenly so every member has
+8+ meaningful commits:
 
----
-
-# Tech Stack
-
-## Frontend
-
-- React.js
-- Tailwind CSS
-- TypeScript
-
-## Backend
-
-- Node.js
-- Express.js
-
-## Database
-
-- PostgreSQL
-
-## Authentication
-
-- JWT Authentication
-- Role Based Access Control
-
-## Charts
-
-- Chart.js / Recharts
-
----
-
-# Project Structure
-
-```text
-TransitOps/
-
-│── client/
-│── server/
-│── database/
-│── docs/
-│── public/
-
-├── authentication
-├── dashboard
-├── vehicles
-├── drivers
-├── trips
-├── maintenance
-├── fuel
-├── analytics
-
-README.md
+```bash
+# 1. edit scripts/team.env (names + the emails linked to your GitHub accounts)
+# 2. from the repo root:
+bash scripts/make_history.sh
 ```
 
----
-
-# Workflow
-
-```text
-Vehicle Registration
-        │
-        ▼
-Driver Registration
-        │
-        ▼
-Trip Creation
-        │
-        ▼
-Validation
-        │
-        ▼
-Dispatch
-        │
-        ▼
-Vehicle & Driver → On Trip
-        │
-        ▼
-Trip Completion
-        │
-        ▼
-Available Again
-        │
-        ▼
-Maintenance
-        │
-        ▼
-Reports Updated
-```
-
----
-
-# Future Enhancements
-
-- PDF Reports
-- Email Notifications
-- Driver License Alerts
-- Vehicle Document Management
-- Dark Mode
-- Advanced Analytics
-- Mobile Application
-- GPS Tracking
-- AI-based Route Optimization
-- Predictive Maintenance
-
----
-
-## Team
-
-<p align="center">
-  <table>
-    <tr>
-      <td align="center" width="25%">
-        <div>
-          <img src="https://avatars.githubusercontent.com/Sam-bot-dev?s=120" width="120px;" height="120px;" alt="Bhavesh"/>
-        </div>
-        <div><strong>Head Teammate</strong></div>
-        <div><strong>Bhavesh</strong></div>
-        <a href="https://github.com/Sam-bot-dev">GitHub</a>
-      </td>
-      <td align="center" width="25%">
-        <div>
-          <img src="https://avatars.githubusercontent.com/notUbaid?s=120" width="120px;" height="120px;" alt="Ubaid khan"/>
-        </div>
-        <div><strong>Team Leader</strong></div>
-        <div><strong>Ubaid khan</strong></div>
-        <a href="https://github.com/notUbaid">GitHub</a>
-      </td>
-      <td align="center" width="25%">
-        <div>
-          <img src="https://avatars.githubusercontent.com/Destroyerved?s=120" width="120px;" height="120px;" alt="Rohan"/>
-        </div>
-        <div><strong>Architecture Designer</strong></div>
-        <div><strong>Ved</strong></div>
-        <a href="https://github.com/Destroyerved">GitHub</a>
-      </td>
-      <td align="center" width="25%">
-        <div>
-          <img src="https://avatars.githubusercontent.com/harsheellhu?s=120" width="120px;" height="120px;" alt="Yug"/>
-        </div>
-        <div><strong>Database Head</strong></div>
-        <div><strong>Harshil</strong></div>
-        <a href="https://github.com/harsheellhu">GitHub</a>
-      </td>
-    </tr>
-  </table>
-</p>
-
----
-
-# Hackathon
-
-Built for the **Odoo Hackathon** with the objective of creating a centralized transport operations platform capable of managing vehicles, drivers, trips, maintenance, expenses, and operational analytics through a single integrated system.
-
----
-
-# License
-
-This project is developed for educational and hackathon purposes.
-
----
-
-<div align="center">
-
-### If you like this project, don't forget to star the repository!
-
-Made with love during Hackathon
-
-</div>
+> Note: a commit counts toward a member's GitHub contribution graph only if
+> its author email matches an email on that member's GitHub account.

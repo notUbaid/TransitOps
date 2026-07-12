@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}TransitOps{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script>
+  // Apply saved theme before first paint to avoid a flash of the wrong mode.
+  (function () {
+    try {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">▣</span> TransitOps</div>
+    <nav class="sidenav">
+      {% for endpoint, module, label, icon in nav %}
+        {% if can(module) %}
+          <a class="nav-item {{ 'active' if active_module == module }}"
+             href="{{ url_for(endpoint) }}">
+            <span class="nav-icon">{{ icon }}</span>{{ label }}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </nav>
+    <div class="sidebar-foot">TRANSITOPS © 2026 · RBAC ENABLED</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <input id="global-search" class="search" type="search"
+             placeholder="Search..." autocomplete="off">
+      <div class="topbar-right">
+        <button id="theme-toggle" class="ghost-btn" type="button"
+                title="Toggle dark mode">◐</button>
+        <div class="user-chip">
+          <div class="user-meta">
+            <strong>{{ g.user['name'] }}</strong>
+            <span>{{ role_label(g.user['role']) }}</span>
+          </div>
+          <div class="avatar">{{ g.user['name'] | initials }}</div>
+        </div>
+        <a class="ghost-btn" href="{{ url_for('auth.logout') }}">Logout</a>
+      </div>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flashes">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+              {{ '❌' if category == 'error' else '✔' }} {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <main class="content">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

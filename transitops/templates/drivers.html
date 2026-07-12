@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block title %}Drivers · TransitOps{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Drivers &amp; Safety Profiles</h1>
+  <div class="head-actions">
+    <a class="btn" href="{{ url_for('drivers.export_csv') }}">Export CSV</a>
+    {% if can('drivers', 'full') %}
+      <a class="btn btn-primary" href="{{ url_for('drivers.index', new=1) }}">+ Add Driver</a>
+    {% endif %}
+  </div>
+</div>
+
+<p class="rule-note">Rule: Expired license or Suspended status → blocked from
+  trip assignment</p>
+
+{% if expiring %}
+<section class="card compliance-card">
+  <div class="row-between">
+    <h2 class="card-title">License compliance
+      <span class="pill pill-suspended">{{ expiring | length }} need attention</span></h2>
+    {% if can('drivers', 'full') %}
+    <form method="post" action="{{ url_for('drivers.send_reminders') }}">
+      <button class="btn btn-sm" type="submit">Send email reminders</button>
+    </form>
+    {% endif %}
+  </div>
+  <ul class="muted small">
+    {% for d in expiring %}
+      <li>{{ d.name }} — {{ d.license_no }}
+        {{ 'expired' if d.already_expired else 'expires' }} {{ d.license_expiry }}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<form class="filters" method="get">
+  <select name="status" onchange="this.form.submit()">
+    <option value="">Status: All</option>
+    {% for s in ['available','on_trip','off_duty','suspended'] %}
+      <option value="{{ s }}" {{ 'selected' if f_status == s }}>
+        {{ s.replace('_',' ') | title }}</option>
+    {% endfor %}
+  </select>
+  <input type="search" name="q" value="{{ q }}" placeholder="Search name or license...">
+  <button class="btn" type="submit">Apply</button>
+</form>
+
+{% if show_form and can('drivers', 'full') %}
+<section class="card form-card">
+  <h2 class="card-title">{{ 'Edit Driver' if edit_driver else 'Add Driver' }}</h2>
+  <form method="post" class="form-grid"
+        action="{{ url_for('drivers.update', driver_id=edit_driver.id)
+                   if edit_driver else url_for('drivers.create') }}">
+    <label>Name
+      <input name="name" required value="{{ edit_driver.name if edit_driver else '' }}"></label>
+    <label>License No.
+      <input name="license_no" required placeholder="DL-88213"
+             value="{{ edit_driver.license_no if edit_driver else '' }}"></label>
+    <label>License Category
+      <select name="category">
+        {% for c in categories %}
+          <option value="{{ c }}"
+            {{ 'selected' if edit_driver and edit_driver.category == c }}>{{ c }}</option>
+        {% endfor %}
+      </select></label>
+    <label>License Expiry
+      <input name="license_expiry" type="date" required
+             value="{{ edit_driver.license_expiry if edit_driver else '' }}"></label>
+    <label>Contact Number
+      <input name="contact" value="{{ edit_driver.contact if edit_driver else '' }}"></label>
+    <label>Safety Score (0–100)
+      <input name="safety_score" type="number" min="0" max="100"
+             value="{{ edit_driver.safety_score if edit_driver else 100 }}"></label>
+    <div class="form-actions">
+      <a class="btn" href="{{ url_for('drivers.index') }}">Cancel</a>
+      <button class="btn btn-primary" type="submit">
+        {{ 'Save Changes' if edit_driver else 'Add Driver' }}</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+<section class="card">
+  <table class="data-table sortable">
+    <thead>
+      <tr>
+        <th>Driver</th><th>License No.</th><th>Category</th><th>Expiry</th>
+        <th>Contact</th><th data-num>Trips Compl.</th><th data-num>Safety</th>
+        <th>Status</th>
+        {% if can('drivers', 'full') %}<th>Toggle Status</th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in drivers %}
+      <tr>
+        <td><strong>{{ d.name }}</strong></td>
+        <td class="mono">{{ d.license_no }}</td>
+        <td>{{ d.category }}</td>
+        <td class="mono">
+          {{ d.license_expiry }}
+          {% if d.expired %}<span class="pill pill-suspended">EXPIRED</span>
+          {% elif d.expiring_soon %}<span class="pill pill-in_shop">EXPIRING</span>{% endif %}
+        </td>
+        <td class="mono">{{ d.contact }}</td>
+        <td class="mono">{{ d.trips_completed }}</td>
+        <td class="mono">{{ d.safety_score }}%</td>
+        <td><span class="pill pill-{{ d.status }}">{{ d.status | replace('_',' ') | title }}</span></td>
+        {% if can('drivers', 'full') %}
+        <td class="row-actions">
+          {% for s in toggleable if s != d.status %}
+            <form method="post" action="{{ url_for('drivers.set_status', driver_id=d.id) }}">
+              <input type="hidden" name="status" value="{{ s }}">
+              <button class="btn btn-sm" type="submit"
+                      {{ 'disabled' if d.status == 'on_trip' }}>
+                {{ s.replace('_',' ') | title }}</button>
+            </form>
+          {% endfor %}
+          <a class="btn btn-sm" href="{{ url_for('drivers.index', edit=d.id) }}">Edit</a>
+        </td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="9" class="muted">No drivers match the current filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

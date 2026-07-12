@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Fleet · TransitOps{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Vehicle Registry</h1>
+  <div class="head-actions">
+    <a class="btn" href="{{ url_for('vehicles.export_csv') }}">Export CSV</a>
+    {% if can('fleet', 'full') %}
+      <a class="btn btn-primary" href="{{ url_for('vehicles.index', new=1) }}">+ Add Vehicle</a>
+    {% endif %}
+  </div>
+</div>
+
+<p class="rule-note">Rule: Registration No. must be unique · Retired / In Shop
+  vehicles are hidden from the Trip Dispatcher</p>
+
+<form class="filters" method="get">
+  <select name="type" onchange="this.form.submit()">
+    <option value="">Type: All</option>
+    {% for t in types %}
+      <option value="{{ t }}" {{ 'selected' if f_type == t }}>{{ t }}</option>
+    {% endfor %}
+  </select>
+  <select name="status" onchange="this.form.submit()">
+    <option value="">Status: All</option>
+    {% for s in ['available','on_trip','in_shop','retired'] %}
+      <option value="{{ s }}" {{ 'selected' if f_status == s }}>
+        {{ s.replace('_',' ') | title }}</option>
+    {% endfor %}
+  </select>
+  <input type="search" name="q" value="{{ q }}" placeholder="Search reg. no...">
+  <button class="btn" type="submit">Apply</button>
+</form>
+
+{% if show_form and can('fleet', 'full') %}
+<section class="card form-card">
+  <h2 class="card-title">{{ 'Edit Vehicle' if edit_vehicle else 'Register Vehicle' }}</h2>
+  <form method="post" class="form-grid"
+        action="{{ url_for('vehicles.update', vehicle_id=edit_vehicle.id)
+                   if edit_vehicle else url_for('vehicles.create') }}">
+    <label>Registration No. (unique)
+      <input name="reg_no" required value="{{ edit_vehicle.reg_no if edit_vehicle else '' }}"
+             placeholder="GJ01AB4521"></label>
+    <label>Name / Model
+      <input name="name" required value="{{ edit_vehicle.name if edit_vehicle else '' }}"
+             placeholder="VAN-05"></label>
+    <label>Type
+      <select name="type">
+        {% for t in types %}
+          <option value="{{ t }}"
+            {{ 'selected' if edit_vehicle and edit_vehicle.type == t }}>{{ t }}</option>
+        {% endfor %}
+      </select></label>
+    <label>Max Load Capacity (kg)
+      <input name="capacity_kg" type="number" step="1" min="1" required
+             value="{{ edit_vehicle.capacity_kg | int if edit_vehicle else '' }}"></label>
+    <label>Odometer (km)
+      <input name="odometer" type="number" step="1" min="0"
+             value="{{ edit_vehicle.odometer | int if edit_vehicle else 0 }}"></label>
+    <label>Acquisition Cost
+      <input name="acquisition_cost" type="number" step="1" min="0"
+             value="{{ edit_vehicle.acquisition_cost | int if edit_vehicle else '' }}"></label>
+    <label>Region
+      <input name="region" value="{{ edit_vehicle.region if edit_vehicle else '' }}"
+             placeholder="Ahmedabad"></label>
+    <div class="form-actions">
+      <a class="btn" href="{{ url_for('vehicles.index') }}">Cancel</a>
+      <button class="btn btn-primary" type="submit">
+        {{ 'Save Changes' if edit_vehicle else 'Register Vehicle' }}</button>
+    </div>
+  </form>
+</section>
+{% endif %}
+
+<section class="card">
+  <table class="data-table sortable">
+    <thead>
+      <tr>
+        <th>Reg. No. (unique)</th><th>Name/Model</th><th>Type</th>
+        <th data-num>Capacity</th><th data-num>Odometer</th><th data-num>Acq. Cost</th>
+        <th>Region</th><th>Status</th>
+        {% if can('fleet', 'full') %}<th></th>{% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for v in vehicles %}
+      <tr>
+        <td class="mono">{{ v.reg_no }}</td>
+        <td><strong>{{ v.name }}</strong></td>
+        <td>{{ v.type }}</td>
+        <td class="mono">{{ v.capacity_kg | inr }} kg</td>
+        <td class="mono">{{ v.odometer | inr }}</td>
+        <td class="mono">{{ v.acquisition_cost | inr }}</td>
+        <td>{{ v.region }}</td>
+        <td><span class="pill pill-{{ v.status }}">{{ v.status | replace('_',' ') | title }}</span></td>
+        {% if can('fleet', 'full') %}
+        <td class="row-actions">
+          <a class="btn btn-sm" href="{{ url_for('vehicles.index', edit=v.id) }}">Edit</a>
+          {% if v.status == 'retired' %}
+            <form method="post" action="{{ url_for('vehicles.reactivate', vehicle_id=v.id) }}">
+              <button class="btn btn-sm" type="submit">Reactivate</button>
+            </form>
+          {% elif v.status != 'on_trip' %}
+            <form method="post" action="{{ url_for('vehicles.retire', vehicle_id=v.id) }}"
+                  onsubmit="return confirm('Retire {{ v.name }}? It will be hidden from dispatch.');">
+              <button class="btn btn-sm btn-danger" type="submit">Retire</button>
+            </form>
+          {% endif %}
+        </td>
+        {% endif %}
+      </tr>
+      {% else %}
+      <tr><td colspan="9" class="muted">No vehicles match the current filters.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

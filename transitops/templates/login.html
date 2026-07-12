@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · TransitOps</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("theme");
+      if (t) document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body class="login-body">
+<div class="login-wrap">
+  <section class="login-brand">
+    <h1><span class="brand-mark">▣</span> TransitOps</h1>
+    <p class="tagline">Smart Transport Operations Platform</p>
+    <p class="roles-intro">One login, four roles:</p>
+    <ul class="role-list">
+      {% for key, r in roles.items() %}<li>{{ r.label }}</li>{% endfor %}
+    </ul>
+    <p class="brand-foot">TRANSITOPS © 2026 · RBAC ENABLED</p>
+  </section>
+
+  <section class="login-card">
+    <h2>Sign in to your account</h2>
+    <p class="muted">Enter your credentials to continue</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          {{ '❌' if category == 'error' else '✔' }} {{ message }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="post" class="stack">
+      <label>Email
+        <input type="email" name="email" placeholder="raven.k@transitops.in" required>
+      </label>
+      <label>Password
+        <input type="password" name="password" placeholder="••••••••" required>
+      </label>
+      <label>Role (RBAC)
+        <select name="role">
+          <option value="">— any role —</option>
+          {% for key, r in roles.items() %}
+            <option value="{{ key }}">{{ r.label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <div class="row-between">
+        <label class="inline"><input type="checkbox" name="remember"> Remember me</label>
+        <a class="link" href="#" onclick="alert('Ask your Fleet Manager to reset it.');return false;">Forgot password?</a>
+      </div>
+      <button class="btn btn-primary btn-block" type="submit">Sign In</button>
+    </form>
+
+    <div class="login-hint">
+      <p class="muted small">Access is scoped by role after login:</p>
+      <ul class="muted small">
+        <li>Fleet Manager → Fleet, Drivers, Maintenance</li>
+        <li>Dispatcher → Dashboard, Trips</li>
+        <li>Safety Officer → Drivers, Compliance</li>
+        <li>Financial Analyst → Fuel &amp; Expenses, Analytics</li>
+      </ul>
+      <p class="muted small">Demo password for all seeded accounts: <code>transit123</code></p>
+    </div>
+  </section>
+</div>
+</body>
+</html>
