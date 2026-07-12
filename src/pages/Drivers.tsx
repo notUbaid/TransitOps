@@ -145,7 +145,7 @@ export function Drivers() {
           </div>
           <div>
             <p className="font-medium text-on-surface">{d.name}</p>
-            <p className="font-mono font-label-sm text-label-sm text-on-surface-variant">{d.licenseNumber}</p>
+            <p className="font-mono text-label-sm text-on-surface-variant">{d.licenseNumber}</p>
           </div>
         </div>
       ),
