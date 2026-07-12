@@ -150,7 +150,7 @@ export function Analytics() {
               <Tooltip
                 contentStyle={tooltipStyle}
                 cursor={{ fill: "rgba(255,255,255,0.03)" }}
-                formatter={(v: number, name) => [formatCurrency(v, currency), name === "revenue" ? "Revenue" : "Cost"]}
+                formatter={(v: any, name: any) => [formatCurrency(v as number, currency), name === "revenue" ? "Revenue" : "Cost"]}
               />
               <Bar dataKey="revenue" fill={C.primary} radius={[4, 4, 0, 0]} maxBarSize={38} isAnimationActive={false} />
               <Line dataKey="cost" stroke={C.tertiary} strokeWidth={2.5} dot={{ r: 3, fill: C.tertiary }} isAnimationActive={false} />
@@ -174,7 +174,7 @@ export function Analytics() {
                       <Cell key={slice.name} fill={PIE_COLORS[slice.name] ?? C.outline} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => formatCurrency(v, currency)} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(v: any) => formatCurrency(v as number, currency)} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="mt-2 space-y-1.5">
@@ -212,7 +212,7 @@ export function Analytics() {
                 <CartesianGrid strokeDasharray="3 3" stroke={C.grid} horizontal={false} />
                 <XAxis type="number" stroke={C.axis} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={(v) => formatCompactCurrency(v, currency)} />
                 <YAxis type="category" dataKey="name" stroke={C.axis} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={80} />
-                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.03)" }} formatter={(v: number) => [formatCurrency(v, currency), "Cost"]} />
+                <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.03)" }} formatter={(v: any) => [formatCurrency(v as number, currency), "Cost"]} />
                 <Bar dataKey="cost" fill={C.tertiaryC} radius={[0, 4, 4, 0]} maxBarSize={26} isAnimationActive={false} />
               </BarChart>
             </ResponsiveContainer>

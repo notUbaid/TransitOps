@@ -30,7 +30,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             key={m.key}
             to={m.path}
             onClick={onNavigate}
-            className={({ isActive }) =>
+            className={({ isActive }: { isActive: boolean }) =>
               cn(
                 "flex items-center gap-3 rounded-xl px-4 py-3 font-label-md text-label-md transition-all duration-200",
                 isActive
@@ -39,7 +39,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               )
             }
           >
-            {({ isActive }) => (
+            {({ isActive }: { isActive: boolean }) => (
               <>
                 <Icon name={m.icon} size={20} fill={isActive} />
                 <span>{m.label}</span>
