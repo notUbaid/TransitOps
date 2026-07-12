@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { prisma } from "@/lib/prisma";
+=======
+import { prisma } from "@/lib/db";
+>>>>>>> Stashed changes
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
